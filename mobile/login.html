@@ -1,7 +1,7 @@
 <!DOCTYPE html> 
 <html> 
 	<head> 
-	<title>Test Title</title> 
+	<title>Shop E-Z-Go Mobile Site</title> 
 	<meta name="viewport" content="width=device-width, initial-scale=1"> 
 	<link rel="stylesheet" href="http://code.jquery.com/mobile/1.1.1/jquery.mobile-1.1.1.min.css" />
 	<script src="http://code.jquery.com/jquery-1.7.1.min.js"></script>
@@ -11,8 +11,8 @@
 
 <div data-role="page">
 
-	<div data-role="header" data-id="headerBar">
-		<h1>Test Title</h1>
+	<div data-role="header" data-id="headerBar" data-position="fixed">
+		<h1><image src="images/shopezgomainlogo.jpg"/></h1>
 		<p align="right">
 			<a href="login.html">Login</a>
 		</p>
@@ -29,13 +29,20 @@
 	</div><!-- /header -->
 
 	<div data-role="content">	
-		<p>Login!!</p>		
+		<form action="login.php" method="post">
+			<div>
+    				Username: <input type="text" name="username" id="basic"/>
+    				Password: <input type="password" name="password" id="basic"/>
+				<button>Login</button>
+			</div>
+		</form>	
 	</div><!-- /content -->
 
 	<div data-role="footer" data-id="footerBar" data-position="fixed"> 
 		<div data-role="navbar">
 			<ul>
 				<li><a href="contactUs.html">Contact Us</a></li> 
+				<li><a href="http://www.shopezgo.com/">Full Site</a></li> 
 			</ul>
 		</div><!-- /navbar -->
 	</div> 
