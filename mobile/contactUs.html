@@ -10,12 +10,13 @@
 <body> 
 
 <div data-role="page">
-
+	<!-- All scripts that need to run on page change go here -->
+	<script type="text/javascript" src="javascript/loginHeader.js"></script>
+	<!-- End scripts -->
 	<div data-role="header" data-id="headerBar" data-position="fixed">
 		<h1><image src="images/shopezgomainlogo.jpg"/></h1>
-		<p align="right">
-			<a href="login.html">Login</a>
-		</p>
+		<!-- This is replaced by the login header by loginHeader.js -->
+		<p align="right" class="loginLink"></p>
 		<div data-role="navbar">
 			<ul>
 				<li><a href="myVehicle.html">My Vehicle</a></li>
@@ -26,7 +27,6 @@
 		</div><!-- /navbar -->
 
 	</div><!-- /header -->
-
 	<div data-role="content">	
 		<p>Contact Us!</p>		
 	</div><!-- /content -->
@@ -44,3 +44,5 @@
 
 </body>
 </html>
+<!-- Fix header if the user nased on if the user is logged in or not -->
+<script type="text/javascript" src="javascript/loginHeader.js"></script>
