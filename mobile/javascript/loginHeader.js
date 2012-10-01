@@ -1,4 +1,3 @@
-$(document).live('pageinit', function() {
 var userName = null;
 $.ajax({
         url: "server/createJsonSession.php",
@@ -6,7 +5,7 @@ $.ajax({
         context: document.body,
         data: {'com': 'loginHeader'},
         success: function(response, textStatus, jqXHR){
-            //Finsih this function to parse json response.
+            //Finsihfdjfsadfsad this function to parse json response.
 		if (response.userName != undefined) {
 			userName = response.userName;
 		}
@@ -28,4 +27,3 @@ $.ajax({
 		$('#headerBar').trigger('create');
         }
     });
-});
