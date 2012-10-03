@@ -3,7 +3,7 @@ function login() {
     uname = $('#usernameField').val();
     pwd = $('#passwordField').val(); 
     $.ajax({
-        url: "server/login.php",
+        url: "server/functions.php",
         type: "post",
         context: document.body,
         data: {'com': 'login', 'username': uname, 'password': pwd},
