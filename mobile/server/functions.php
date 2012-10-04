@@ -11,6 +11,7 @@ if (isset($_POST['com'])){
 	$command = $_GET['com'];
 }*/
 
+//Checks the login info from login.js
 if (strcasecmp($command, 'login') == 0){
 	$uname = "";
 	$pword = "";
@@ -25,6 +26,7 @@ if (strcasecmp($command, 'login') == 0){
 	}else {
 		jsonResponse('Username or password does not match');
 	}
+//Loads info for the serial number search in myVehicle.js
 }else if (strcasecmp($command, 'serialsearch') == 0){
 	$serial = "";
 	if (isset($_POST['serial'])){
@@ -35,6 +37,7 @@ if (strcasecmp($command, 'login') == 0){
 	}*/
 	
 	if (strcasecmp($vehicle_serial, $serial) == 0){
+	$_SESSION['tempSerialNumber'] = '1234567890';
 	$vehicle = array(
 		"found" => true,
 		"model" => "2FIVE",
@@ -48,6 +51,30 @@ if (strcasecmp($command, 'login') == 0){
 		);
 	}
 	jsonResponse($vehicle);
+//Loads the info for vehicleResults.js
+}else if (strcasecmp($command, 'vehicleResultsLoad') == 0){
+	$serial = $_SESSION['tempSerialNumber'];
+	if (isset($_POST['serial'])){
+		$serial = $_POST['serial'];	
+	}/* Use this when testing code
+	  *else if (isset($_GET['serial'])){
+		$serial = $_GET['serial'];
+	}*/
+	
+	if (strcasecmp($vehicle_serial, $serial) == 0){
+	$_SESSION['serialNumber'] = '1234567890';
+	$vehicle = array(
+		"found" => true,
+		"model" => "2FIVE",
+		"fuel" => "Electric 48 V",
+		"sub_model" => "4 Passenger",
+		"year" => "2012"
+	);
+	jsonResponse($vehicle);
+	}else {
+		jsonResponse("There was an error with the tempSerialNumber in the session.");
+	}
+
 }
 
 function jsonResponse($param, $print = true, $header = true) {

@@ -5,13 +5,14 @@ $.ajax({
         context: document.body,
         data: {'com': 'loginHeader'},
         success: function(response, textStatus, jqXHR){
-            //Finsihfdjfsadfsad this function to parse json response.
 		if (response.userName != undefined) {
 			userName = response.userName;
 		}
+		//If login was successful, display name
 		if (userName != null) {
 			$('.loginLink').replaceWith('<p align="right" class="loginLink"> Welcome ' + userName + '  <a href="login.html">Login to Different User</a></p>');
 		} else {
+		//Otherwise, just display login
 			$('.loginLink').replaceWith('<p align="right" class="loginLink"><a href="login.html" id>Login</a></p>');
 		}
 		$('#headerBar').trigger('create');
