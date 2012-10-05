@@ -13,6 +13,7 @@
 <div data-role="page">
 	<!-- All scripts that need to run on page change go here -->
 	<script type="text/javascript" src="javascript/loginHeader.js"></script>
+	<script type="text/javascript" src="javascript/parts.js"></script>
 	<!-- End scripts -->
 	<div data-role="header" data-id="headerBar" data-position="fixed">
 		<h1><image src="images/shopezgomainlogo.jpg"/></h1>
@@ -30,7 +31,10 @@
 	</div><!-- /header -->
 
 	<div data-role="content">	
-		<p>Parts!</p>		
+		<div id = "partsOverviewContent" name = "partsOverviewContent">
+			<button onClick="cancel()" id="removeFilterButton" name="removeFilterButton">Remove Vehicle Filter</button>
+			Parts!
+		</div>		
 	</div><!-- /content -->
 
 	<div data-role="footer" data-id="footerBar" data-position="fixed"> 

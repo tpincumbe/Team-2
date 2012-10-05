@@ -52,17 +52,10 @@ if (strcasecmp($command, 'login') == 0){
 	}
 	jsonResponse($vehicle);
 //Loads the info for vehicleResults.js
-}else if (strcasecmp($command, 'vehicleResultsLoad') == 0){
+} else if (strcasecmp($command, 'vehicleResultsLoad') == 0){
+	//Get the serial number from the session
 	$serial = $_SESSION['tempSerialNumber'];
-	if (isset($_POST['serial'])){
-		$serial = $_POST['serial'];	
-	}/* Use this when testing code
-	  *else if (isset($_GET['serial'])){
-		$serial = $_GET['serial'];
-	}*/
-	
 	if (strcasecmp($vehicle_serial, $serial) == 0){
-	$_SESSION['serialNumber'] = '1234567890';
 	$vehicle = array(
 		"found" => true,
 		"model" => "2FIVE",
@@ -74,9 +67,42 @@ if (strcasecmp($command, 'login') == 0){
 	}else {
 		jsonResponse("There was an error with the tempSerialNumber in the session.");
 	}
-
+//Cancels the vehicle results by removing the temp serial number
+} else if (strcasecmp($command, 'vehicleResultsCancel') == 0){
+	//Remove the temporary serial number
+	$_SESSION['tempSerialNumber'] = "";
+	jsonResponse(true);
+//Saves the selected vehicle to the session
+} else if (strcasecmp($command, 'vehicleResultsSessionSave') == 0){
+	$serialNumber = $_SESSION['tempSerialNumber'];	
+	//Remove the temporary serial number
+	$_SESSION['tempSerialNumber'] = "";
+	$_SESSION['currentSerialNumber'] = $serialNumber;
+	jsonResponse(true);
+//Loads the filter for the parts page
+} else if (strcasecmp($command, 'partsLoad') == 0){
+	//Get the serial number from the session
+	$serial = $_SESSION['currentSerialNumber'];
+	if (strcasecmp($vehicle_serial, $serial) == 0){
+		$vehicle = array(
+			"found" => true,
+			"model" => "2FIVE",
+			"fuel" => "Electric 48 V",
+			"sub_model" => "4 Passenger",
+			"year" => "2012"
+		);
+	}else {
+		$vehicle = array(
+			"found" => false
+		);
+	}
+	jsonResponse($vehicle);
+//Removes the parts filter by removing the current serial number in the session
+} else if (strcasecmp($command, 'vehicleFilterCancel') == 0){
+	//Remove the session serial number
+	$_SESSION['currentSerialNumber'] = "";
+	jsonResponse(true);
 }
-
 function jsonResponse($param, $print = true, $header = true) {
     if (is_array($param)) {
         $out = array(
