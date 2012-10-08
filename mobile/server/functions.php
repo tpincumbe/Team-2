@@ -1,9 +1,144 @@
+
 <?php
 session_start();
 $username = 'trey';
 $password = 'abc';
 $vehicle_serial = '1234567890';
 $command = "";
+$model1 = array(
+	'id' => 1,
+	'name' => 'Shuttle'
+);
+$model2 = array(
+	'id' => 2,
+	'name' => 'Terrain'	
+);
+$models = array(
+	'0' => $model1,
+	'1' => $model2
+);
+$fuel1 = array(
+	'id' => 10,
+	'name' => 'Gas'
+);
+$fuel2 = array(
+	'id' => 20,
+	'name' => 'Electric 48V'	
+);
+$fuels = array(
+	'0' => $fuel1,
+	'1' => $fuel2
+);
+$submodel1 = array(
+	'id' => 100,
+	'name' => '250'
+);
+$submodel2 = array(
+	'id' => 200,
+	'name' => '1000'	
+);
+$submodels = array(
+	'0' => $submodel1,
+	'1' => $submodel2
+);
+$year1 = array(
+	'id' => 1000,
+	'name' => '2011'
+);
+$year2 = array(
+	'id' => 2000,
+	'name' => '2012'	
+);
+$years = array(
+	'0' => $year1,
+	'1' => $year2
+);
+$vehicle1 = array(
+	'modelId' => 1,
+	'fuelId' => 10,
+	'submodelId' => 100,
+	'yearId' => 1000
+);
+$vehicle2 = array(
+	'modelId' => 1,
+	'fuelId' => 10,
+	'submodelId' => 100,
+	'yearId' => 2000
+);
+$vehicle3 = array(
+	'modelId' => 1,
+	'fuelId' => 10,
+	'submodelId' => 200,
+	'yearId' => 1000
+);
+$vehicle4 = array(
+	'modelId' => 1,
+	'fuelId' => 10,
+	'submodelId' => 200,
+	'yearId' => 2000
+);
+$vehicle5 = array(
+	'modelId' => 1,
+	'fuelId' => 20,
+	'submodelId' => 100,
+	'yearId' => 1000
+);
+$vehicle6 = array(
+	'modelId' => 1,
+	'fuelId' => 20,
+	'submodelId' => 100,
+	'yearId' => 2000
+);
+$vehicle7 = array(
+	'modelId' => 1,
+	'fuelId' => 20,
+	'submodelId' => 200,
+	'yearId' => 1000
+);
+$vehicle8 = array(
+	'modelId' => 1,
+	'fuelId' => 20,
+	'submodelId' => 200,
+	'yearId' => 2000
+);
+$vehicle9 = array(
+	'modelId' => 2,
+	'fuelId' => 20,
+	'submodelId' => 200,
+	'yearId' => 2000
+);
+$vehicles = array(
+	'0' => $vehicle1,
+	'1' => $vehicle2,
+	'2' => $vehicle3,
+	'3' => $vehicle4,
+	'4' => $vehicle5,
+	'5' => $vehicle6,
+	'6' => $vehicle7,
+	'7' => $vehicle8,
+	'8' => $vehicle9
+);
+/* A list of all possible com values in the order they appear below
+	login - Checks user name and password, saves user to session if successful
+	serialsearch - Checks the serial number against known serial numbers and saves
+		a match to session if successful
+	vehicleResultsLoad - Loads the information of the vehicle about to be selected
+	vehicleResultsCancel - Clears the info about the vehicle about to be selected
+	vehicleResultsSessionSave - Saves the selected vehicle to the session for filtering
+	partsLoad - Loads the currently selected filter for the parts page
+	vehicleFilterCancel - Removes the current vehicle filter from the session	
+ */
+
+/* A list of all the session variables
+	currentSerialNumber - The serial number of the vehicle currently saved in
+		the session for parts filtering
+	tempSerialNumber - The serial number of the vehicle that needs to be confirmed
+		on the final myVehicle page
+	uname - The logged in username
+	uid - The logged in user id
+	
+ */
+
 if (isset($_POST['com'])){
 	$command = $_POST['com'];	
 }/* Use this when testing code
