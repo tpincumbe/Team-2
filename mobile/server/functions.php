@@ -54,54 +54,63 @@ $years = array(
 	'1' => $year2
 );
 $vehicle1 = array(
+	'serialNumber' => 1,
 	'modelId' => 1,
 	'fuelId' => 10,
 	'submodelId' => 100,
 	'yearId' => 1000
 );
 $vehicle2 = array(
+	'serialNumber' => 2,
 	'modelId' => 1,
 	'fuelId' => 10,
 	'submodelId' => 100,
 	'yearId' => 2000
 );
 $vehicle3 = array(
+	'serialNumber' => 3,
 	'modelId' => 1,
 	'fuelId' => 10,
 	'submodelId' => 200,
 	'yearId' => 1000
 );
 $vehicle4 = array(
+	'serialNumber' => 4,
 	'modelId' => 1,
 	'fuelId' => 10,
 	'submodelId' => 200,
 	'yearId' => 2000
 );
 $vehicle5 = array(
+	'serialNumber' => 5,
 	'modelId' => 1,
 	'fuelId' => 20,
 	'submodelId' => 100,
 	'yearId' => 1000
 );
 $vehicle6 = array(
+	'serialNumber' => 6,
 	'modelId' => 1,
 	'fuelId' => 20,
 	'submodelId' => 100,
 	'yearId' => 2000
 );
 $vehicle7 = array(
+	'serialNumber' => 7,
 	'modelId' => 1,
 	'fuelId' => 20,
 	'submodelId' => 200,
 	'yearId' => 1000
 );
 $vehicle8 = array(
+	'serialNumber' => 8,
 	'modelId' => 1,
 	'fuelId' => 20,
 	'submodelId' => 200,
 	'yearId' => 2000
 );
 $vehicle9 = array(
+	'serialNumber' => 9,
 	'modelId' => 2,
 	'fuelId' => 20,
 	'submodelId' => 200,
