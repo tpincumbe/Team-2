@@ -138,16 +138,25 @@ $vehicles = array(
 	vehicleFilterCancel - Removes the current vehicle filter from the session
 	selectModelLoad - Loads the possible model choices for select vehicle
 	selectModelSave - Saves the model selection from select vehicle	
+	selectFuelLoad - Loads the possible fuel choices for select vehicle
+	selectFuelSave - Saves the fuel selection from select vehicle	
+	selectSubmodelLoad - Loads the possible submodel choices for select vehicle
+	selectSubmodelSave - Saves the submodel selection from select vehicle	
+	selectYearLoad - Loads the possible year choices for select vehicle
+	selectYearSave - Saves the year selection from select vehicle	
  */
 
 /* A list of all the session variables
 	currentSerialNumber - The serial number of the vehicle currently saved in
+		the session for parts filtering
+	currentVehicle - The info of the vehicle currently saved in
 		the session for parts filtering
 	tempFuel - The fuel selected in select vehicle
 	tempModel - The model id selected in select vehicle
 	tempSerialNumber - The serial number of the vehicle that needs to be confirmed
 		on the final myVehicle page
 	tempSubmodel - The submodel selected in select vehilce
+	tempVehicle - The vehicle (with name strings) selected in select vehicle
 	tempYear - The year selected in select vehicle.
 	uname - The logged in username
 	uid - The logged in user id
