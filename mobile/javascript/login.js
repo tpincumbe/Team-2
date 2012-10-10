@@ -14,9 +14,10 @@ function login() {
             	var error = response.errors.reason;
             	$('#loginResult').text("Unable to log in");
 	    } else {
-            	$('#loginResult').text("Welcome, " + uname);
-		$('.loginLink').replaceWith('<p align="right" class="loginLink"> Welcome ' + uname + '  <a href="login.html">Login to Different User</a></p>');
-		$('#headerBar').trigger('create');
+		//Continue to the account page	
+		var path = window.location.pathname;
+		path = path.substring(0, path.lastIndexOf('/'));
+		window.location = path + "/myAccount.html";
 	    }
         },
         error: function(jqXHR, textStatus, errorThrown){
