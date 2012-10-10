@@ -1,4 +1,3 @@
-
 <?php
 session_start();
 $username = 'trey';
@@ -144,6 +143,7 @@ $vehicles = array(
 	selectSubmodelSave - Saves the submodel selection from select vehicle	
 	selectYearLoad - Loads the possible year choices for select vehicle
 	selectYearSave - Saves the year selection from select vehicle	
+	logout - Logs out the user
  */
 
 /* A list of all the session variables
@@ -442,6 +442,10 @@ if (strcasecmp($command, 'login') == 0){
 	}
 	$_SESSION['tempYear'] = $selectedYear;
 	jsonResponse(true);
+//Logs the user out of the session
+} else if (strcasecmp($command, 'logout') == 0){
+	$_SESSION['uname'] = $uname;
+	$_SESSION['uid'] = 0;
 }
 
 
