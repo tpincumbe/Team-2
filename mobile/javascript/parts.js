@@ -12,14 +12,16 @@ $.ajax({
 				//Display the vehilce information
 				var model = response.data.model;
 				var fuel = response.data.fuel;
-				var submodel = response.data.submodel;
+				var submodel = response.data.sub_model;
 				var year = response.data.year;
 				$('#partsOverviewContent').replaceWith('<div id = "partsOverviewContent" name = "partsOverviewContent" > Currently Selected Vehicle: <br> Model: ' + model + '<br/>Fuel: ' + fuel + '<br/>Submodel: ' + submodel + '<br/>Year: ' + year + '<button onClick="cancel()">Remove Vehicle Filter</button></div>');
 				$('#removeFilterButton').show();
+				$('#partsOverviewContent').trigger('create');
 			} else {
 				//Display general parts info
 				$('#partsOverviewContent').replaceWith('<div id = "partsOverviewContent" name = "partsOverviewContent" > Parts!</div>');
 				$('#removeFilterButton').hide();
+				$('#partsOverviewContent').trigger('create');
 			}
 		}
         },

@@ -1,0 +1,50 @@
+<!DOCTYPE html> 
+<html> 
+	<head> 
+	<title>Shop E-Z-Go Mobile Site</title> 
+	<meta name="viewport" content="width=device-width, initial-scale=1"> 
+	<link rel="stylesheet" href="http://code.jquery.com/mobile/1.1.1/jquery.mobile-1.1.1.min.css" />
+	<script src="http://code.jquery.com/jquery-1.7.1.min.js"></script>
+	<script src="http://code.jquery.com/mobile/1.1.1/jquery.mobile-1.1.1.min.js"></script>
+</head> 
+<body> 
+
+<div data-role="page">
+	<!-- All scripts that need to run on page change go here -->
+	<script type="text/javascript" src="javascript/loginHeader.js"></script>
+	<script type="text/javascript" src="javascript/selectSubmodel.js"></script>
+	<!-- End scripts -->
+	<div data-role="header" data-id="headerBar" data-position="fixed">
+		<h1><image src="images/shopezgomainlogo.jpg"/></h1>
+		<!-- This is replaced by the login header by loginHeader.js -->
+		<p align="right" class="loginLink"></p>
+		<div data-role="navbar">
+			<ul>
+				<li><a href="myVehicle.html" class="ui-btn-active ui-state-persist">My Vehicle</a></li>
+				<li><a href="ezgotv.html">EZGo TV (Probably fix title)</a></li>
+				<li><a href="findADealer.html">Find a Dealer</a></li>
+				<li><a href="parts.html">Parts</a></li>
+			</ul>
+		</div><!-- /navbar -->
+
+	</div><!-- /header -->
+
+	<div data-role="content" data-id="myVehcileSelectSubmodelContent">
+		<div id = "selectSubmodelContent" name = "selectSubmodelContent" >
+			Error		
+		</div>
+	</div><!-- /content -->
+
+	<div data-role="footer" data-id="footerBar" data-position="fixed"> 
+		<div data-role="navbar">
+			<ul>
+				<li><a href="contactUs.html">Contact Us</a></li> 
+				<li><a href="http://www.shopezgo.com/">Full Site</a></li> 
+			</ul>
+		</div><!-- /navbar -->
+	</div> 
+
+</div><!-- /page -->
+
+</body>
+</html>

@@ -11,9 +11,10 @@ $.ajax({
 			//Display the vehilce information
 			var model = response.data.model;
 			var fuel = response.data.fuel;
-			var submodel = response.data.submodel;
+			var submodel = response.data.sub_model;
 			var year = response.data.year;
 			$('#vehicleResultsContent').replaceWith('<div id = "vehicleResultsContent" name = "vehicleResultsContent" > Model: ' + model + '<br/>Fuel: ' + fuel + '<br/>Submodel: ' + submodel + '<br/>Year: ' + year + '</div>');
+			$('#vehicleResultsContent').trigger('create');
 		}
         },
         error: function(jqXHR, textStatus, errorThrown){

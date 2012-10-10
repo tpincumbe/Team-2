@@ -135,14 +135,20 @@ $vehicles = array(
 	vehicleResultsCancel - Clears the info about the vehicle about to be selected
 	vehicleResultsSessionSave - Saves the selected vehicle to the session for filtering
 	partsLoad - Loads the currently selected filter for the parts page
-	vehicleFilterCancel - Removes the current vehicle filter from the session	
+	vehicleFilterCancel - Removes the current vehicle filter from the session
+	selectModelLoad - Loads the possible model choices for select vehicle
+	selectModelSave - Saves the model selection from select vehicle	
  */
 
 /* A list of all the session variables
 	currentSerialNumber - The serial number of the vehicle currently saved in
 		the session for parts filtering
+	tempFuel - The fuel selected in select vehicle
+	tempModel - The model id selected in select vehicle
 	tempSerialNumber - The serial number of the vehicle that needs to be confirmed
 		on the final myVehicle page
+	tempSubmodel - The submodel selected in select vehilce
+	tempYear - The year selected in select vehicle.
 	uname - The logged in username
 	uid - The logged in user id
 	
@@ -200,34 +206,6 @@ if (strcasecmp($command, 'login') == 0){
 	//Get the serial number from the session
 	$serial = $_SESSION['tempSerialNumber'];
 	if (strcasecmp($vehicle_serial, $serial) == 0){
-	$vehicle = array(
-		"found" => true,
-		"model" => "2FIVE",
-		"fuel" => "Electric 48 V",
-		"sub_model" => "4 Passenger",
-		"year" => "2012"
-	);
-	jsonResponse($vehicle);
-	}else {
-		jsonResponse("There was an error with the tempSerialNumber in the session.");
-	}
-//Cancels the vehicle results by removing the temp serial number
-} else if (strcasecmp($command, 'vehicleResultsCancel') == 0){
-	//Remove the temporary serial number
-	$_SESSION['tempSerialNumber'] = "";
-	jsonResponse(true);
-//Saves the selected vehicle to the session
-} else if (strcasecmp($command, 'vehicleResultsSessionSave') == 0){
-	$serialNumber = $_SESSION['tempSerialNumber'];	
-	//Remove the temporary serial number
-	$_SESSION['tempSerialNumber'] = "";
-	$_SESSION['currentSerialNumber'] = $serialNumber;
-	jsonResponse(true);
-//Loads the filter for the parts page
-} else if (strcasecmp($command, 'partsLoad') == 0){
-	//Get the serial number from the session
-	$serial = $_SESSION['currentSerialNumber'];
-	if (strcasecmp($vehicle_serial, $serial) == 0){
 		$vehicle = array(
 			"found" => true,
 			"model" => "2FIVE",
@@ -235,7 +213,102 @@ if (strcasecmp($command, 'login') == 0){
 			"sub_model" => "4 Passenger",
 			"year" => "2012"
 		);
-	}else {
+		$_SESSION['tempVehicle'] = $vehicle;	
+		jsonResponse($vehicle);
+	}else { 
+		//Check if a vehicle was selected from the selection screen.
+		$modelId = $_SESSION['tempModel'];
+		$fuelId = $_SESSION['tempFuel'];
+		$submodelId = $_SESSION['tempSubmodel'];
+		$yearId = $_SESSION['tempYear'];
+		$currentVehicle = '';
+		$found = false;
+		foreach($vehicles as &$curVehicle) {
+			if (((($curVehicle['modelId'] == $modelId) && ($curVehicle['fuelId'] == $fuelId)) 
+				&& ($curVehicle['submodelId'] == $submodelId)) && ($curVehicle['yearId'] == $yearId)){
+					$currentVehicle = $curVehicle;	
+					$found = true;
+			}
+		}
+		unset($curVehicle);
+		if ($found) {
+			$_SESSION['tempSerialNumber'] = $currentVehicle['serialNumber'];
+			//Find the name of each part of the vehicle
+			$currentModel = '';
+			$currentFuel = '';
+			$currentSubmodel = '';
+			$currentYear = '';
+			//Get model
+			foreach($models as &$curModel) {
+				if ($curModel['id'] == $modelId){
+					$currentModel = $curModel['name'];	
+				}
+			}
+			unset($curModel);
+			//Get fuel
+			foreach($fuels as &$curFuel) {
+				if ($curFuel['id'] == $fuelId){
+					$currentFuel = $curFuel['name'];	
+				}
+			}
+			unset($curFuel);
+			//Get submodel
+			foreach($submodels as &$curSubmodel) {
+				if ($curSubmodel['id'] == $submodelId){
+					$currentSubmodel = $curSubmodel['name'];	
+				}
+			}
+			unset($curSubmodel);
+			//Get year
+			foreach($years as &$curYear) {
+				if ($curYear['id'] == $yearId){
+					$currentYear = $curYear['name'];	
+				}
+			}
+			unset($curYear);
+			$returnedVehicle = array(
+				"found" => true,
+				"model" => $currentModel,
+				"fuel" => $currentFuel,
+				"sub_model" => $currentSubmodel,
+				"year" => $currentYear				
+			);	
+			$_SESSION['tempVehicle'] = $returnedVehicle;	
+			jsonResponse($returnedVehicle);
+		} else {
+			jsonResponse("There was an error in the session.");
+		}
+	}
+//Cancels the vehicle results by removing the temp serial number
+} else if (strcasecmp($command, 'vehicleResultsCancel') == 0){
+	//Remove the temporary serial number
+	$_SESSION['tempSerialNumber'] = "";
+	$_SESSION['tempModel'] = "";
+	$_SESSION['tempFuel'] = "";
+	$_SESSION['tempSubmodel'] = "";
+	$_SESSION['tempYear'] = "";
+	$_SESSION['tempVehicle'] = "";	
+	jsonResponse(true);
+//Saves the selected vehicle to the session
+} else if (strcasecmp($command, 'vehicleResultsSessionSave') == 0){
+	$serialNumber = $_SESSION['tempSerialNumber'];	
+	$vehicle = $_SESSION['tempVehicle'];	
+	//Remove the temporary serial number
+	$_SESSION['tempSerialNumber'] = "";
+	$_SESSION['tempModel'] = "";
+	$_SESSION['tempFuel'] = "";
+	$_SESSION['tempSubmodel'] = "";
+	$_SESSION['tempYear'] = "";
+	$_SESSION['tempVehicle'] = "";	
+	$_SESSION['currentSerialNumber'] = $serialNumber;
+	$_SESSION['currentVehicle'] = $vehicle;	
+	jsonResponse(true);
+//Loads the filter for the parts page
+} else if (strcasecmp($command, 'partsLoad') == 0){
+	//Get the serial number from the session
+	$serial = $_SESSION['currentSerialNumber'];
+	$vehicle = $_SESSION['currentVehicle'];
+	if (strcasecmp($serial, "") == 0) {
 		$vehicle = array(
 			"found" => false
 		);
@@ -245,8 +318,124 @@ if (strcasecmp($command, 'login') == 0){
 } else if (strcasecmp($command, 'vehicleFilterCancel') == 0){
 	//Remove the session serial number
 	$_SESSION['currentSerialNumber'] = "";
+	$_SESSION['currentVehicle'] = "";
+	jsonResponse(true);
+//Loads the models for the select model page
+}else if (strcasecmp($command, 'selectModelLoad') == 0){
+	jsonResponse($models);
+//Saves the model id from selectModel.js
+} else if (strcasecmp($command, 'selectModelSave') == 0){
+	$selectedModel = "";
+	if (isset($_POST['model'])){
+		$selectedModel = $_POST['model'];
+	}
+	$_SESSION['tempModel'] = $selectedModel;
+	jsonResponse(true);
+//Loads the fuels for the select fuel page
+}else if (strcasecmp($command, 'selectFuelLoad') == 0){
+	//This is sloppy but it will be nicer once its SQL
+	$modelId = $_SESSION['tempModel'];
+	$found1 = false;
+	$found2 = false;
+	foreach($vehicles as &$curVehicle) {
+		if ($curVehicle['modelId'] == $modelId) {
+			if ($curVehicle['fuelId'] == 10) {
+				$found1 = true;
+			} else if ($curVehicle['fuelId'] == 20) {
+				$found2 = true;
+			}
+		}
+	}
+	unset($curVehicle);
+	$returnedFuels = "";
+	if ($found1) {
+		$returnedFuels = $fuels;
+	} else {
+		$returnedFuels = array(
+			'0' => $fuel2
+		);
+	}
+	jsonResponse($returnedFuels);
+//Saves the fuel id from selectFuel.js
+} else if (strcasecmp($command, 'selectFuelSave') == 0){
+	$selectedFuel = "";
+	if (isset($_POST['fuel'])){
+		$selectedFuel = $_POST['fuel'];
+	}
+	$_SESSION['tempFuel'] = $selectedFuel;
+	jsonResponse(true);
+//Loads the submodels for the select submodel page
+}else if (strcasecmp($command, 'selectSubmodelLoad') == 0){
+	//This is sloppy but it will be nicer once its SQL
+	$modelId = $_SESSION['tempModel'];
+	$fuelId = $_SESSION['tempFuel'];
+	$found1 = false;
+	$found2 = false;
+	foreach($vehicles as &$curVehicle) {
+		if (($curVehicle['modelId'] == $modelId) && ($curVehicle['fuelId'] == $fuelId)){
+			if ($curVehicle['submodelId'] == 100) {
+				$found1 = true;
+			} else if ($curVehicle['submodelId'] == 200) {
+				$found2 = true;
+			}
+		}
+	}
+	unset($curVehicle);
+	$returnedSubmodels = "";
+	if ($found1) {
+		$returnedSubmodels = $submodels;
+	} else {
+		$returnedSubmodels = array(
+			'0' => $submodel2
+		);
+	}
+	jsonResponse($returnedSubmodels);
+//Saves the submodel id from selectSubmodel.js
+} else if (strcasecmp($command, 'selectSubmodelSave') == 0){
+	$selectedSubmodel = "";
+	if (isset($_POST['submodel'])){
+		$selectedSubmodel = $_POST['submodel'];
+	}
+	$_SESSION['tempSubmodel'] = $selectedSubmodel;
+	jsonResponse(true);
+//Loads the years for the select year page
+}else if (strcasecmp($command, 'selectYearLoad') == 0){
+	//This is sloppy but it will be nicer once its SQL
+	$modelId = $_SESSION['tempModel'];
+	$fuelId = $_SESSION['tempFuel'];
+	$submodelId = $_SESSION['tempSubmodel'];
+	$found1 = false;
+	$found2 = false;
+	foreach($vehicles as &$curVehicle) {
+		if ((($curVehicle['modelId'] == $modelId) && ($curVehicle['fuelId'] == $fuelId)) && ($curVehicle['submodelId'] == $submodelId)){
+			if ($curVehicle['yearId'] == 1000) {
+				$found1 = true;
+			} else if ($curVehicle['yearId'] == 2000) {
+				$found2 = true;
+			}
+		}
+	}
+	unset($curVehicle);
+	$returnedYears = "";
+	if ($found1) {
+		$returnedYears = $years;
+	} else {
+		$returnedYears = array(
+			'0' => $year2
+		);
+	}
+	jsonResponse($returnedYears);
+//Saves the year id from selectYear.js
+} else if (strcasecmp($command, 'selectYearSave') == 0){
+	$selectedYear = "";
+	if (isset($_POST['year'])){
+		$selectedYear = $_POST['year'];
+	}
+	$_SESSION['tempYear'] = $selectedYear;
 	jsonResponse(true);
 }
+
+
 function jsonResponse($param, $print = true, $header = true) {
     if (is_array($param)) {
         $out = array(
