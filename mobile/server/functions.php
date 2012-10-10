@@ -126,6 +126,26 @@ $vehicles = array(
 	'7' => $vehicle8,
 	'8' => $vehicle9
 );
+$accountVehicle1 = array(
+	"found" => true,
+	"serialNumber" => 20,
+	"model" => "TXT",
+	"fuel" => "Electric 48 V",
+	"sub_model" => "Submodel A",
+	"year" => "2012"
+);
+$accountVehicle2 = array(
+	"found" => true,
+	"serialNumber" => 30,
+	"model" => "Express",
+	"fuel" => "Gas",
+	"sub_model" => "Submodel B",
+	"year" => "2005"
+);
+$accountVehicles = array(
+	'0' => $accountVehicle1,
+	'1' => $accountVehicle2
+);
 /* A list of all possible com values in the order they appear below
 	login - Checks user name and password, saves user to session if successful
 	serialsearch - Checks the serial number against known serial numbers and saves
@@ -144,6 +164,7 @@ $vehicles = array(
 	selectYearLoad - Loads the possible year choices for select vehicle
 	selectYearSave - Saves the year selection from select vehicle	
 	logout - Logs out the user
+	accountVehiclesLoad - Loads the vehicles for the current account
  */
 
 /* A list of all the session variables
@@ -446,6 +467,25 @@ if (strcasecmp($command, 'login') == 0){
 } else if (strcasecmp($command, 'logout') == 0){
 	$_SESSION['uname'] = $uname;
 	$_SESSION['uid'] = 0;
+//Loads the vehicles for the current user
+} else if (strcasecmp($command, 'accountVehiclesLoad') == 0){
+	jsonResponse($accountVehicles);
+//Saves the selected vehicle to the session as aparts filter
+} else if (strcasecmp($command, 'accountVehicleSessionSave') == 0){
+	$serialNumber = '';
+	$selectedVehicle = '';	
+	if (isset($_POST['serialNumber'])){
+		$serialNumber = $_POST['serialNumber'];
+	}
+	foreach($accountVehicles as &$curVehicle) {
+		if ($curVehicle['serialNumber'] == $serialNumber) {
+			$selectedVehicle = $curVehicle;
+		}
+	}
+	unset($curVehicle);
+	$_SESSION['currentSerialNumber'] = $serialNumber;
+	$_SESSION['currentVehicle'] = $selectedVehicle;
+	jsonResponse($_SESSION['currentVehicle']);
 }
 
 

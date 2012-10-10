@@ -9,6 +9,7 @@ $.ajax({
 			alert(response.errors.reason);
 		} else {
 			//Display the vehilce information
+			var vehicles = response.data;
 			var model = response.data.model;
 			var fuel = response.data.fuel;
 			var submodel = response.data.sub_model;
