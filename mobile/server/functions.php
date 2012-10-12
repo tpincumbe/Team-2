@@ -495,13 +495,7 @@ function jsonResponse($param, $print = true, $header = true) {
             'success' => true
         );
  
-        if (is_array($param['data'])) {
-            $out['data'] = $param['data'];
-            unset($param['data']);
-            $out = array_merge($out, $param);
-        } else {
-            $out['data'] = $param;
-        }
+        $out['data'] = $param;
  
     } else if (is_bool($param)) {
         $out = array(
