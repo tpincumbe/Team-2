@@ -10,7 +10,7 @@ function initialize() {
 	 }
 	 var map = new google.maps.Map(document.getElementById("map_canvas"), myOptions);	// Grabs the map element
 	 
-	 var i, marker, printers = window.printers;
+	 /*var i, marker, printers = window.printers;
 	 var infowindow = new google.maps.InfoWindow();
 	 
 	 for (i = 0; i < printers.length; i++){
@@ -35,18 +35,7 @@ function initialize() {
 				 infowindow.open(map,marker);
 			 }
 		 })(marker, i));
-	 }
-}
-	
-	
-/*
-*	This function creates the google map with our key
-*/
-function loadScript() {
-	var script = document.createElement("script");
-	script.type = "text/javascript";
-	script.src = "http://maps.googleapis.com/maps/api/js?key=AIzaSyBMtjbKML2WeqX7NdNSJWEy06_t7M1DzTU&sensor=false&callback=initialize";
-	document.body.appendChild(script);
+	 }*/
 }
 
 /*
@@ -69,5 +58,5 @@ function getPrinters() {
 *	Once the page is fully loaded we will build the map
 */
 $(document).ready(function() {
-   loadScript();
+   initialize();
 });
