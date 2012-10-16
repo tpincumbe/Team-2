@@ -1,5 +1,7 @@
 <?php
 session_start();
+//mysql_connect('130.207.114.235','cs4911_team20','qqtgyu0O') or die( "Unable to connect");
+//mysql_select_db('cs4911_team20') or die( "Unable to select database");
 $username = 'trey';
 $password = 'abc';
 $vehicle_serial = '1234567890';

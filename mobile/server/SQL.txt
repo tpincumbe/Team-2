@@ -1,0 +1,341 @@
+Login (Change the parts in where):
+
+SELECT  accountId,
+	userName
+  FROM  Account
+ WHERE  userName = 'trey'
+   AND  password = 'abc'
+
+
+Serial Search Vehicle Results (Change where):
+
+    SELECT vt.serialNumber,
+           mlu.name as model,
+           flu.name as fuel,
+           slu.name as submodel,
+           ylu.name as year
+      FROM Vehicle_Type vt
+INNER JOIN Model_LU mlu
+        ON mlu.modelId = vt.modelId
+INNER JOIN Fuel_LU flu
+        ON flu.fuelId = vt.fuelId
+INNER JOIN Submodel_LU slu
+        ON slu.submodelId = vt.submodelId
+INNER JOIN Year_LU ylu
+        ON ylu.yearId = vt.yearId
+     WHERE vt.serialNumber = '1234567890'
+
+
+Get Models:
+
+SELECT *
+  FROM Model_LU
+
+
+Get Fuels (Change where):
+
+    SELECT flu.*
+      FROM Fuel_LU flu
+INNER JOIN Vehicle_Type vt
+        ON vt.fuelId = flu.fuelId
+     WHERE vt.modelId = '1'
+  GROUP BY flu.fuelId
+
+
+Get Submodels (Change Where):
+
+    SELECT slu.*
+      FROM Submodel_LU slu
+INNER JOIN Vehicle_Type vt
+        ON vt.submodelId = slu.submodelId
+     WHERE vt.modelId = '1'
+       AND vt.fuelId = '1'
+  GROUP BY slu.submodelId
+
+
+Get Year (Change Where)
+
+    SELECT ylu.*
+      FROM Year_LU ylu
+INNER JOIN Vehicle_Type vt
+        ON vt.yearId = ylu.yearId
+     WHERE vt.modelId = '1'
+       AND vt.fuelId = '1'
+       AND vt.submodelId = '1'
+  GROUP BY ylu.yearId
+
+
+Select Vehicle Results (Change Where):
+
+    SELECT vt.serialNumber,
+           mlu.name as model,
+           flu.name as fuel,
+           slu.name as submodel,
+           ylu.name as year
+      FROM Vehicle_Type vt
+INNER JOIN Model_LU mlu
+        ON mlu.modelId = vt.modelId
+INNER JOIN Fuel_LU flu
+        ON flu.fuelId = vt.fuelId
+INNER JOIN Submodel_LU slu
+        ON slu.submodelId = vt.submodelId
+INNER JOIN Year_LU ylu
+        ON ylu.yearId = vt.yearId
+     WHERE vt.modelId = '1'
+       AND vt.fuelId = '1'
+       AND vt.submodelId = '1'
+       AND vt.yearId = '1'
+
+
+Save to Account (Change Values):
+
+INSERT INTO Account_Vehicle
+     VALUES (1, 1)
+
+
+Account Vehicles (Change Where) :
+
+    SELECT vt.serialNumber,
+           mlu.name as model,
+           flu.name as fuel,
+           slu.name as submodel,
+           ylu.name as year
+      FROM Account_Vehicle av
+INNER JOIN Vehicle_Type vt
+        ON av.serialNumber = vt.serialNumber
+INNER JOIN Model_LU mlu
+        ON mlu.modelId = vt.modelId
+INNER JOIN Fuel_LU flu
+        ON flu.fuelId = vt.fuelId
+INNER JOIN Submodel_LU slu
+        ON slu.submodelId = vt.submodelId
+INNER JOIN Year_LU ylu
+        ON ylu.yearId = vt.yearId
+     WHERE av.accountId = '1'
+
+
+Remove Vehicle (Change Where):
+
+DELETE FROM Account_Vehicle
+      WHERE accountId = '1'
+        AND serialNumber = '1'
+
+
+Get Categories:
+
+SELECT *
+  FROM Part_Category_LU
+
+
+Get Subcategories (change where):
+
+SELECT subcategoryId,
+       name
+  FROM Part_Subcategory_LU
+ WHERE categoryId = '1'
+
+
+Get Parts (change where):
+
+    SELECT p.partNumber,
+	   p.name,
+           p.price,
+           p.description,
+	   pslu.name AS subcategoryName,
+           plu.name AS categoryName,
+           alu.name AS availability
+      FROM Part p
+INNER JOIN Part_Subcategory_LU pslu
+        ON p.partSubcategoryId = pslu.subcategoryId
+INNER JOIN Part_Category_LU plu
+        ON pslu.categoryId = plu.categoryId
+INNER JOIN Availability_LU alu
+        ON p.availabilityId = alu.availabilityId
+     WHERE p.partSubcategoryId = '4'
+
+
+Get Part (change where)
+
+    SELECT p.partNumber,
+	   p.name,
+           p.price,
+           p.description,
+	   pslu.name AS subcategoryName,
+           plu.name AS categoryName,
+           alu.name AS availability
+      FROM Part p
+INNER JOIN Part_Subcategory_LU pslu
+        ON p.partSubcategoryId = pslu.subcategoryId
+INNER JOIN Part_Category_LU plu
+        ON pslu.categoryId = plu.categoryId
+INNER JOIN Availability_LU alu
+        ON p.availabilityId = alu.availabilityId
+     WHERE p.partNumber = '70046'
+
+
+Filtered Get Category (Change Where) :
+
+    SELECT pclu.*
+      FROM Part_Category_LU pclu
+INNER JOIN Part_Subcategory_LU pslu
+        ON pclu.categoryId = pslu.categoryId
+INNER JOIN Part p
+        ON p.partSubcategoryId = pslu.subcategoryId
+INNER JOIN Vehicle_Type_Part vtp
+        ON vtp.partNumber = p.partNumber
+     WHERE vtp.serialNumber = '10'
+  GROUP BY pclu.categoryId
+
+
+Filtered Get Subcategory (Change Where) :
+
+    SELECT pslu.subcategoryId,
+           pslu.name
+      FROM Part_Subcategory_LU pslu
+INNER JOIN Part_Category_LU pclu
+        ON pslu.categoryId = pclu.categoryId
+INNER JOIN Part p
+        ON p.partSubcategoryId = pslu.subcategoryId
+INNER JOIN Vehicle_Type_Part vtp
+        ON vtp.partNumber = p.partNumber
+     WHERE vtp.serialNumber = '10'
+       AND pslu.categoryId = '1'
+  GROUP BY pslu.subcategoryId
+
+
+Filtered Get Parts (Change where):
+
+    SELECT p.partNumber,
+	   p.name,
+           p.price,
+           p.description,
+	   pslu.name AS subcategoryName,
+           plu.name AS categoryName,
+           alu.name AS availability
+      FROM Part p
+INNER JOIN Vehicle_Type_Part vtp
+        ON p.partNumber = vtp.partNumber
+INNER JOIN Part_Subcategory_LU pslu
+        ON p.partSubcategoryId = pslu.subcategoryId
+INNER JOIN Part_Category_LU plu
+        ON pslu.categoryId = plu.categoryId
+INNER JOIN Availability_LU alu
+        ON p.availabilityId = alu.availabilityId
+     WHERE vtp.serialNumber = '10'
+       AND p.partSubcategoryId = '4'
+
+
+Search For Part (Change where):
+
+SELECT Results.rank,
+       p.partNumber,
+       p.name,
+       p.price,
+       p.description,
+       pslu.name AS subcategoryName,
+       plu.name AS categoryName,
+       alu.name AS availability
+FROM(
+(
+	SELECT 1 AS rank,
+               partNumber
+          FROM Part
+         WHERE partNumber = '70046'
+)
+UNION
+(
+	SELECT 2 AS rank,
+               partNumber
+          FROM Part
+         WHERE UPPER(name) = UPPER('Front Square AxlE')
+)
+UNION
+(
+	SELECT 3 AS rank,
+               partNumber
+          FROM Part
+         WHERE partNumber LIKE '7%'
+)
+UNION
+(
+	SELECT 4 AS rank,
+               partNumber
+          FROM Part
+         WHERE UPPER(name) LIKE UPPER('B%')
+)
+UNION
+(
+	SELECT 5 AS rank,
+               partNumber
+          FROM Part
+         WHERE partNumber LIKE '%6%'
+)
+UNION
+(
+	SELECT 6 AS rank,
+               partNumber
+          FROM Part
+         WHERE UPPER(name) LIKE UPPER('%a%')
+)
+) AS Results
+INNER JOIN Part p
+        ON p.partNumber = Results.partNumber
+INNER JOIN Part_Subcategory_LU pslu
+        ON p.partSubcategoryId = pslu.subcategoryId
+INNER JOIN Part_Category_LU plu
+        ON pslu.categoryId = plu.categoryId
+INNER JOIN Availability_LU alu
+        ON p.availabilityId = alu.availabilityId
+  GROUP BY Results.partNumber
+    HAVING MIN(rank)
+  ORDER BY Results.rank ASC, Results.partNumber ASC
+
+
+Add to Shopping Cart (change value):
+
+INSERT INTO Shopping_Cart
+     VALUES (1, 72719)
+
+
+Checkout (Change where):
+
+DELETE FROM Shopping_Cart
+      WHERE accountId = '1'
+        AND partNumber = '72719'
+
+
+View Shopping Cart (Change Where):
+
+    SELECT p.partNumber,
+	   p.name,
+           p.price,
+           p.description,
+	   pslu.name AS subcategoryName,
+           plu.name AS categoryName,
+           alu.name AS availability
+      FROM Shopping_Cart sc
+INNER JOIN Part p
+        ON sc.partNumber = p.partNumber
+INNER JOIN Part_Subcategory_LU pslu
+        ON p.partSubcategoryId = pslu.subcategoryId
+INNER JOIN Part_Category_LU plu
+        ON pslu.categoryId = plu.categoryId
+INNER JOIN Availability_LU alu
+        ON p.availabilityId = alu.availabilityId
+     WHERE sc.accountId = '1'
+
+
+View Account Info (Change where):
+
+SELECT *
+  FROM Account
+ WHERE accountId = '1'
+
+
+Modify Account Info (Change where):
+
+UPDATE Account
+   SET password = 'abc',
+       email    = 'update@update.com',
+       offers   = 'N'
+ WHERE accountId = '2'
