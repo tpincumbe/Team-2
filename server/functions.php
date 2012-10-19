@@ -2,8 +2,6 @@
 session_start();
 //mysql_connect('130.207.114.235','cs4911_team20','qqtgyu0O') or die( "Unable to connect");
 //mysql_select_db('cs4911_team20') or die( "Unable to select database");
-$username = 'trey';
-$password = 'abc';
 $vehicle_serial = '1234567890';
 $command = "";
 $model1 = array(
@@ -186,37 +184,40 @@ $accountVehicles = array(
 	
  */
 
-if (isset($_POST['com'])){
-	$command = $_POST['com'];	
-}/* Use this when testing code
-  *else if (isset($_GET['com'])){
-	$command = $_GET['com'];
-}*/
+$request = "";
+//Finds the type or the request (get or post)
+switch($_SERVER['REQUEST_METHOD']){
+    case 'GET': $request = &$_GET; break;
+    case 'POST': $request = &$_POST; break;
+    default: $request = &$_GET;
+        
+}
+
+if (isset($request['com'])){
+	$command = $request['com'];	
+}
 
 //Checks the login info from login.js
 if (strcasecmp($command, 'login') == 0){
 	$uname = "";
 	$pword = "";
-	if (isset($_POST['username']) && isset($_POST['password'])){
-		$uname = $_POST['username'];
-		$pword = $_POST['password'];
+        $data = array();
+	if (isset($request['username']) && isset($request['password'])){
+            $data['command'] = "authenticate";
+	    $data['username'] = $request['username'];
+            $data['password'] = $request['password'];
 	}
-	if ($username == $uname && $pword == $password){
-		$_SESSION['uname'] = $uname;
-		$_SESSION['uid'] = 0;
-		jsonResponse(true);
-	}else {
-		jsonResponse('Username or password does not match');
-	}
+        
+        $output = do_post_request($data);
+        print_r($output);
+        echo($output);
+        return $output;
 //Loads info for the serial number search in myVehicle.js
 }else if (strcasecmp($command, 'serialsearch') == 0){
 	$serial = "";
-	if (isset($_POST['serial'])){
-		$serial = $_POST['serial'];	
-	}/* Use this when testing code
-	  *else if (isset($_GET['serial'])){
-		$serial = $_GET['serial'];
-	}*/
+	if (isset($request['serial'])){
+		$serial = $request['serial'];	
+	}
 	
 	if (strcasecmp($vehicle_serial, $serial) == 0){
 	$_SESSION['tempSerialNumber'] = '1234567890';
@@ -358,8 +359,8 @@ if (strcasecmp($command, 'login') == 0){
 //Saves the model id from selectModel.js
 } else if (strcasecmp($command, 'selectModelSave') == 0){
 	$selectedModel = "";
-	if (isset($_POST['model'])){
-		$selectedModel = $_POST['model'];
+	if (isset($request['model'])){
+		$selectedModel = $request['model'];
 	}
 	$_SESSION['tempModel'] = $selectedModel;
 	jsonResponse(true);
@@ -391,8 +392,8 @@ if (strcasecmp($command, 'login') == 0){
 //Saves the fuel id from selectFuel.js
 } else if (strcasecmp($command, 'selectFuelSave') == 0){
 	$selectedFuel = "";
-	if (isset($_POST['fuel'])){
-		$selectedFuel = $_POST['fuel'];
+	if (isset($request['fuel'])){
+		$selectedFuel = $request['fuel'];
 	}
 	$_SESSION['tempFuel'] = $selectedFuel;
 	jsonResponse(true);
@@ -425,8 +426,8 @@ if (strcasecmp($command, 'login') == 0){
 //Saves the submodel id from selectSubmodel.js
 } else if (strcasecmp($command, 'selectSubmodelSave') == 0){
 	$selectedSubmodel = "";
-	if (isset($_POST['submodel'])){
-		$selectedSubmodel = $_POST['submodel'];
+	if (isset($request['submodel'])){
+		$selectedSubmodel = $request['submodel'];
 	}
 	$_SESSION['tempSubmodel'] = $selectedSubmodel;
 	jsonResponse(true);
@@ -460,8 +461,8 @@ if (strcasecmp($command, 'login') == 0){
 //Saves the year id from selectYear.js
 } else if (strcasecmp($command, 'selectYearSave') == 0){
 	$selectedYear = "";
-	if (isset($_POST['year'])){
-		$selectedYear = $_POST['year'];
+	if (isset($request['year'])){
+		$selectedYear = $request['year'];
 	}
 	$_SESSION['tempYear'] = $selectedYear;
 	jsonResponse(true);
@@ -476,8 +477,8 @@ if (strcasecmp($command, 'login') == 0){
 } else if (strcasecmp($command, 'accountVehicleSessionSave') == 0){
 	$serialNumber = '';
 	$selectedVehicle = '';	
-	if (isset($_POST['serialNumber'])){
-		$serialNumber = $_POST['serialNumber'];
+	if (isset($request['serialNumber'])){
+		$serialNumber = $request['serialNumber'];
 	}
 	foreach($accountVehicles as &$curVehicle) {
 		if ($curVehicle['serialNumber'] == $serialNumber) {
@@ -522,5 +523,43 @@ function jsonResponse($param, $print = true, $header = true) {
     }
  
     return $out;
+}
+
+function do_post_request($params, $optional_headers = null){
+    $ini = parse_ini_file("init.ini");
+    $url = $ini['url'];
+    echo("URL:" . $url . "<br />");
+    
+    // Build Http query using params
+    $query = http_build_query ($params);
+    
+    print_r($query);
+    
+    // Create Http context details
+    $contextData = array ( 
+        'method' => 'POST',
+        'header' => "Connection: close\r\n".
+        "Content-Type: application/x-www-form-urlencoded\r\n".
+        "Content-Length: ".strlen($query)."\r\n",
+        'content'=> $query
+    );
+    
+    echo("<br/>");
+    print_r($contextData);
+    echo("<br/>");
+
+    // Create context resource for our request
+    $context = stream_context_create (array ( 'http' => $contextData ));
+    
+    print_r($context);
+    echo("<br/>");
+
+    // Read page rendered as result of your POST request
+    $result =  file_get_contents ($url, false, $context);
+    
+    print_r($result);
+    
+    echo $result;
+    return;
 }
 ?>

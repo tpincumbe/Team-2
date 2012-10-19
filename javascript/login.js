@@ -14,8 +14,13 @@ function login() {
             	var error = response.errors.reason;
             	$('#loginResult').text("Unable to log in");
 	    } else {
-		//Continue to the account page	
+		//Continue to the account page
 		var path = window.location.pathname;
+		var authorized = response.data.auth;
+		var accountID = "";
+		if (authorized == true)
+		    accountID = response.data.accountID;
+		
 		path = path.substring(0, path.lastIndexOf('/'));
 		window.location = path + "/myAccount.html";
 	    }
