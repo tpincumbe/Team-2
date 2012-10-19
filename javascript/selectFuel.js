@@ -12,7 +12,7 @@ $.ajax({
 			var fuels = response.data;
 			var string = '<div id = "selectFuelContent" name = "selectFuelContent" >';
 			$.each(fuels, function(index, value) {
-				string = string + '<button onclick="selectFuel(value)" value="' + value.id + '">' + value.name + '</button><br/>'
+				string = string + '<button onclick="selectFuel(value)" value="' + value.fuelId + '">' + value.name + '</button><br/>'
 			});
 			string = string + '</div>';
 			$('#selectFuelContent').replaceWith(string);

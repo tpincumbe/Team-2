@@ -12,7 +12,7 @@ $.ajax({
 				//Display the vehilce information
 				var model = response.data.model;
 				var fuel = response.data.fuel;
-				var submodel = response.data.sub_model;
+				var submodel = response.data.submodel;
 				var year = response.data.year;
 				$('#partsOverviewContent').replaceWith('<div id = "partsOverviewContent" name = "partsOverviewContent" > Currently Selected Vehicle: <br> Model: ' + model + '<br/>Fuel: ' + fuel + '<br/>Submodel: ' + submodel + '<br/>Year: ' + year + '<button onClick="cancel()" id="removeFilterButton" name="removeFilterButton">Remove Vehicle Filter</button></div>');
 				$('#partsOverviewContent').trigger('create');

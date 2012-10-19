@@ -15,7 +15,8 @@ $.ajax({
 		//Otherwise, just display login
 			$('.loginLink').replaceWith('<p align="right" class="loginLink"><a href="login.html" id>Login</a></p>');
 		}
-		$('#headerBar').trigger('create');
+		//$('#headerBar').trigger('create');
+		$(document).trigger('pageinit');
         },
         error: function(jqXHR, textStatus, errorThrown){
             // log the error to the console
@@ -25,7 +26,8 @@ $.ajax({
             );
 		//Cancel login
 		$('.loginLink').replaceWith('<p align="right" class="loginLink"><a href="login.html" id>Login</a></p>');
-		$('#headerBar').trigger('create');
+		//$('#headerBar').trigger('create');
+		$(document).trigger('pageinit');
         }
     });
 

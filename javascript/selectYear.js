@@ -12,7 +12,7 @@ $.ajax({
 			var years = response.data;
 			var string = '<div id = "selectYearContent" name = "selectYearContent" >';
 			$.each(years, function(index, value) {
-				string = string + '<button onclick="selectYear(value)" value="' + value.id + '">' + value.name + '</button><br/>'
+				string = string + '<button onclick="selectYear(value)" value="' + value.yearId + '">' + value.name + '</button><br/>'
 			});
 			string = string + '</div>';
 			$('#selectYearContent').replaceWith(string);

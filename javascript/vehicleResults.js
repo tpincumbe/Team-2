@@ -12,7 +12,7 @@ $.ajax({
 			var vehicles = response.data;
 			var model = response.data.model;
 			var fuel = response.data.fuel;
-			var submodel = response.data.sub_model;
+			var submodel = response.data.submodel;
 			var year = response.data.year;
 			$('#vehicleResultsContent').replaceWith('<div id = "vehicleResultsContent" name = "vehicleResultsContent" > Model: ' + model + '<br/>Fuel: ' + fuel + '<br/>Submodel: ' + submodel + '<br/>Year: ' + year + '</div>');
 			$('#vehicleResultsContent').trigger('create');

@@ -12,7 +12,7 @@ $.ajax({
 			var submodels = response.data;
 			var string = '<div id = "selectSubmodelContent" name = "selectSubmodelContent" >';
 			$.each(submodels, function(index, value) {
-				string = string + '<button onclick="selectSubmodel(value)" value="' + value.id + '">' + value.name + '</button><br/>'
+				string = string + '<button onclick="selectSubmodel(value)" value="' + value.submodelId + '">' + value.name + '</button><br/>'
 			});
 			string = string + '</div>';
 			$('#selectSubmodelContent').replaceWith(string);

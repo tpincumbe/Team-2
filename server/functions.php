@@ -1,131 +1,8 @@
 <?php
 session_start();
-//mysql_connect('130.207.114.235','cs4911_team20','qqtgyu0O') or die( "Unable to connect");
-//mysql_select_db('cs4911_team20') or die( "Unable to select database");
-$vehicle_serial = '1234567890';
+mysql_connect('localhost','cs4911_team20','qqtgyu0O') or die( "Unable to connect");
+mysql_select_db('cs4911_team20') or die( "Unable to select database");
 $command = "";
-$model1 = array(
-	'id' => 1,
-	'name' => 'Shuttle'
-);
-$model2 = array(
-	'id' => 2,
-	'name' => 'Terrain'	
-);
-$models = array(
-	'0' => $model1,
-	'1' => $model2
-);
-$fuel1 = array(
-	'id' => 10,
-	'name' => 'Gas'
-);
-$fuel2 = array(
-	'id' => 20,
-	'name' => 'Electric 48V'	
-);
-$fuels = array(
-	'0' => $fuel1,
-	'1' => $fuel2
-);
-$submodel1 = array(
-	'id' => 100,
-	'name' => '250'
-);
-$submodel2 = array(
-	'id' => 200,
-	'name' => '1000'	
-);
-$submodels = array(
-	'0' => $submodel1,
-	'1' => $submodel2
-);
-$year1 = array(
-	'id' => 1000,
-	'name' => '2011'
-);
-$year2 = array(
-	'id' => 2000,
-	'name' => '2012'	
-);
-$years = array(
-	'0' => $year1,
-	'1' => $year2
-);
-$vehicle1 = array(
-	'serialNumber' => 1,
-	'modelId' => 1,
-	'fuelId' => 10,
-	'submodelId' => 100,
-	'yearId' => 1000
-);
-$vehicle2 = array(
-	'serialNumber' => 2,
-	'modelId' => 1,
-	'fuelId' => 10,
-	'submodelId' => 100,
-	'yearId' => 2000
-);
-$vehicle3 = array(
-	'serialNumber' => 3,
-	'modelId' => 1,
-	'fuelId' => 10,
-	'submodelId' => 200,
-	'yearId' => 1000
-);
-$vehicle4 = array(
-	'serialNumber' => 4,
-	'modelId' => 1,
-	'fuelId' => 10,
-	'submodelId' => 200,
-	'yearId' => 2000
-);
-$vehicle5 = array(
-	'serialNumber' => 5,
-	'modelId' => 1,
-	'fuelId' => 20,
-	'submodelId' => 100,
-	'yearId' => 1000
-);
-$vehicle6 = array(
-	'serialNumber' => 6,
-	'modelId' => 1,
-	'fuelId' => 20,
-	'submodelId' => 100,
-	'yearId' => 2000
-);
-$vehicle7 = array(
-	'serialNumber' => 7,
-	'modelId' => 1,
-	'fuelId' => 20,
-	'submodelId' => 200,
-	'yearId' => 1000
-);
-$vehicle8 = array(
-	'serialNumber' => 8,
-	'modelId' => 1,
-	'fuelId' => 20,
-	'submodelId' => 200,
-	'yearId' => 2000
-);
-$vehicle9 = array(
-	'serialNumber' => 9,
-	'modelId' => 2,
-	'fuelId' => 20,
-	'submodelId' => 200,
-	'yearId' => 2000
-);
-$vehicles = array(
-	'0' => $vehicle1,
-	'1' => $vehicle2,
-	'2' => $vehicle3,
-	'3' => $vehicle4,
-	'4' => $vehicle5,
-	'5' => $vehicle6,
-	'6' => $vehicle7,
-	'7' => $vehicle8,
-	'8' => $vehicle9
-);
 $accountVehicle1 = array(
 	"found" => true,
 	"serialNumber" => 20,
@@ -218,99 +95,87 @@ if (strcasecmp($command, 'login') == 0){
 	if (isset($request['serial'])){
 		$serial = $request['serial'];	
 	}
-	
-	if (strcasecmp($vehicle_serial, $serial) == 0){
-	$_SESSION['tempSerialNumber'] = '1234567890';
-	$vehicle = array(
-		"found" => true,
-		"model" => "2FIVE",
-		"fuel" => "Electric 48 V",
-		"sub_model" => "4 Passenger",
-		"year" => "2012"
-	);
-	}else {
-		$vehicle = array(
-			"found" => false
-		);
+	//Search the database	
+	$query = "
+		    SELECT vt.serialNumber,
+			   mlu.name as model,
+			   flu.name as fuel,
+			   slu.name as submodel,
+			   ylu.name as year
+		      FROM Vehicle_Type vt
+		INNER JOIN Model_LU mlu
+			ON mlu.modelId = vt.modelId
+		INNER JOIN Fuel_LU flu
+			ON flu.fuelId = vt.fuelId
+		INNER JOIN Submodel_LU slu
+			ON slu.submodelId = vt.submodelId
+		INNER JOIN Year_LU ylu
+			ON ylu.yearId = vt.yearId
+		     WHERE vt.serialNumber = '$serial'";          
+	$result = mysql_query ($query)  or die(mysql_error());
+	//Return either the result or that there was no result
+	if ($row = mysql_fetch_array($result)) {
+		$row['found'] = true;
+		$_SESSION['tempSerialNumber'] = $serial;
+		jsonResponse($row);
+	} else {
+		jsonResponse("There were no results.");
 	}
-	jsonResponse($vehicle);
 //Loads the info for vehicleResults.js
 } else if (strcasecmp($command, 'vehicleResultsLoad') == 0){
 	//Get the serial number from the session
 	$serial = $_SESSION['tempSerialNumber'];
-	if (strcasecmp($vehicle_serial, $serial) == 0){
-		$vehicle = array(
-			"found" => true,
-			"model" => "2FIVE",
-			"fuel" => "Electric 48 V",
-			"sub_model" => "4 Passenger",
-			"year" => "2012"
-		);
-		$_SESSION['tempVehicle'] = $vehicle;	
-		jsonResponse($vehicle);
+	if (!empty($serial)){
+		$query = "    SELECT vt.serialNumber,
+				   mlu.name as model,
+				   flu.name as fuel,
+				   slu.name as submodel,
+				   ylu.name as year
+			      FROM Vehicle_Type vt
+			INNER JOIN Model_LU mlu
+				ON mlu.modelId = vt.modelId
+			INNER JOIN Fuel_LU flu
+				ON flu.fuelId = vt.fuelId
+			INNER JOIN Submodel_LU slu
+				ON slu.submodelId = vt.submodelId
+			INNER JOIN Year_LU ylu
+				ON ylu.yearId = vt.yearId
+			     WHERE vt.serialNumber = '$serial'";
 	}else { 
-		//Check if a vehicle was selected from the selection screen.
+		//Use a different query if picked from the select screens
 		$modelId = $_SESSION['tempModel'];
 		$fuelId = $_SESSION['tempFuel'];
 		$submodelId = $_SESSION['tempSubmodel'];
 		$yearId = $_SESSION['tempYear'];
-		$currentVehicle = '';
-		$found = false;
-		foreach($vehicles as &$curVehicle) {
-			if (((($curVehicle['modelId'] == $modelId) && ($curVehicle['fuelId'] == $fuelId)) 
-				&& ($curVehicle['submodelId'] == $submodelId)) && ($curVehicle['yearId'] == $yearId)){
-					$currentVehicle = $curVehicle;	
-					$found = true;
-			}
-		}
-		unset($curVehicle);
-		if ($found) {
-			$_SESSION['tempSerialNumber'] = $currentVehicle['serialNumber'];
-			//Find the name of each part of the vehicle
-			$currentModel = '';
-			$currentFuel = '';
-			$currentSubmodel = '';
-			$currentYear = '';
-			//Get model
-			foreach($models as &$curModel) {
-				if ($curModel['id'] == $modelId){
-					$currentModel = $curModel['name'];	
-				}
-			}
-			unset($curModel);
-			//Get fuel
-			foreach($fuels as &$curFuel) {
-				if ($curFuel['id'] == $fuelId){
-					$currentFuel = $curFuel['name'];	
-				}
-			}
-			unset($curFuel);
-			//Get submodel
-			foreach($submodels as &$curSubmodel) {
-				if ($curSubmodel['id'] == $submodelId){
-					$currentSubmodel = $curSubmodel['name'];	
-				}
-			}
-			unset($curSubmodel);
-			//Get year
-			foreach($years as &$curYear) {
-				if ($curYear['id'] == $yearId){
-					$currentYear = $curYear['name'];	
-				}
-			}
-			unset($curYear);
-			$returnedVehicle = array(
-				"found" => true,
-				"model" => $currentModel,
-				"fuel" => $currentFuel,
-				"sub_model" => $currentSubmodel,
-				"year" => $currentYear				
-			);	
-			$_SESSION['tempVehicle'] = $returnedVehicle;	
-			jsonResponse($returnedVehicle);
-		} else {
-			jsonResponse("There was an error in the session.");
-		}
+		$query = "  SELECT vt.serialNumber,
+				   mlu.name as model,
+				   flu.name as fuel,
+				   slu.name as submodel,
+				   ylu.name as year
+			      FROM Vehicle_Type vt
+			INNER JOIN Model_LU mlu
+				ON mlu.modelId = vt.modelId
+			INNER JOIN Fuel_LU flu
+				ON flu.fuelId = vt.fuelId
+			INNER JOIN Submodel_LU slu
+				ON slu.submodelId = vt.submodelId
+			INNER JOIN Year_LU ylu
+				ON ylu.yearId = vt.yearId
+			     WHERE vt.modelId = '$modelId'
+			       AND vt.fuelId = '$fuelId'
+			       AND vt.submodelId = '$submodelId'
+			       AND vt.yearId = '$yearId'";
+	} 
+	//Run the query
+	$result = mysql_query ($query)  or die(mysql_error());
+	//Return either the result or that there was no result
+	if ($row = mysql_fetch_array($result)) {
+		$row['found'] = true;
+		$_SESSION['tempVehicle'] = $row;
+		$_SESSION['tempSerialNumber'] = $row['serialNumber'];	
+		jsonResponse($row);
+	} else {
+		jsonResponse("There was an error in the session.");
 	}
 //Cancels the vehicle results by removing the temp serial number
 } else if (strcasecmp($command, 'vehicleResultsCancel') == 0){
@@ -355,7 +220,22 @@ if (strcasecmp($command, 'login') == 0){
 	jsonResponse(true);
 //Loads the models for the select model page
 }else if (strcasecmp($command, 'selectModelLoad') == 0){
-	jsonResponse($models);
+	//Search the databases
+	$query = "SELECT *
+  		FROM Model_LU";
+	$result = mysql_query ($query)  or die(mysql_error());
+	$models = array();
+	$i = 0;
+	//Return all results or that there was no result
+	while ($row = mysql_fetch_array($result)) {
+		$models[$i] = $row;
+		$i = $i + 1;
+	} 
+	if (!empty($models)) {
+		jsonResponse($models);
+	} else {
+		jsonResponse("There are no models matching this filter.");
+	}
 //Saves the model id from selectModel.js
 } else if (strcasecmp($command, 'selectModelSave') == 0){
 	$selectedModel = "";
@@ -363,32 +243,31 @@ if (strcasecmp($command, 'login') == 0){
 		$selectedModel = $request['model'];
 	}
 	$_SESSION['tempModel'] = $selectedModel;
-	jsonResponse(true);
+	jsonResponse("This is a test '$selectedModel");
 //Loads the fuels for the select fuel page
 }else if (strcasecmp($command, 'selectFuelLoad') == 0){
-	//This is sloppy but it will be nicer once its SQL
+	//Get the model from the session
 	$modelId = $_SESSION['tempModel'];
-	$found1 = false;
-	$found2 = false;
-	foreach($vehicles as &$curVehicle) {
-		if ($curVehicle['modelId'] == $modelId) {
-			if ($curVehicle['fuelId'] == 10) {
-				$found1 = true;
-			} else if ($curVehicle['fuelId'] == 20) {
-				$found2 = true;
-			}
-		}
-	}
-	unset($curVehicle);
-	$returnedFuels = "";
-	if ($found1) {
-		$returnedFuels = $fuels;
+	//Search the databases
+	$query = "    SELECT flu.*
+		        FROM Fuel_LU flu
+		  INNER JOIN Vehicle_Type vt
+	       		  ON vt.fuelId = flu.fuelId
+		       WHERE vt.modelId = '$modelId'
+		    GROUP BY flu.fuelId";
+	$result = mysql_query ($query)  or die(mysql_error());
+	$fuels = array();
+	$i = 0;
+	//Return all results or that there was no result
+	while ($row = mysql_fetch_array($result)) {
+		$fuels[$i] = $row;
+		$i = $i + 1;
+	} 
+	if (!empty($fuels)) {
+		jsonResponse($fuels);
 	} else {
-		$returnedFuels = array(
-			'0' => $fuel2
-		);
+		jsonResponse("There are no fuels matching this filter.");
 	}
-	jsonResponse($returnedFuels);
 //Saves the fuel id from selectFuel.js
 } else if (strcasecmp($command, 'selectFuelSave') == 0){
 	$selectedFuel = "";
@@ -399,30 +278,30 @@ if (strcasecmp($command, 'login') == 0){
 	jsonResponse(true);
 //Loads the submodels for the select submodel page
 }else if (strcasecmp($command, 'selectSubmodelLoad') == 0){
-	//This is sloppy but it will be nicer once its SQL
+	//Get the model and fuel from the session
 	$modelId = $_SESSION['tempModel'];
 	$fuelId = $_SESSION['tempFuel'];
-	$found1 = false;
-	$found2 = false;
-	foreach($vehicles as &$curVehicle) {
-		if (($curVehicle['modelId'] == $modelId) && ($curVehicle['fuelId'] == $fuelId)){
-			if ($curVehicle['submodelId'] == 100) {
-				$found1 = true;
-			} else if ($curVehicle['submodelId'] == 200) {
-				$found2 = true;
-			}
-		}
-	}
-	unset($curVehicle);
-	$returnedSubmodels = "";
-	if ($found1) {
-		$returnedSubmodels = $submodels;
+	//Search the databases
+	$query = "          SELECT slu.*
+			      FROM Submodel_LU slu
+			INNER JOIN Vehicle_Type vt
+				ON vt.submodelId = slu.submodelId
+			     WHERE vt.modelId = '$modelId'
+			       AND vt.fuelId = '$fuelId'
+			  GROUP BY slu.submodelId";
+	$result = mysql_query ($query)  or die(mysql_error());
+	$submodels = array();
+	$i = 0;
+	//Return all results or that there was no result
+	while ($row = mysql_fetch_array($result)) {
+		$submodels[$i] = $row;
+		$i = $i + 1;
+	} 
+	if (!empty($submodels)) {
+		jsonResponse($submodels);
 	} else {
-		$returnedSubmodels = array(
-			'0' => $submodel2
-		);
+		jsonResponse("There are no submodels matching this filter.");
 	}
-	jsonResponse($returnedSubmodels);
 //Saves the submodel id from selectSubmodel.js
 } else if (strcasecmp($command, 'selectSubmodelSave') == 0){
 	$selectedSubmodel = "";
@@ -433,31 +312,32 @@ if (strcasecmp($command, 'login') == 0){
 	jsonResponse(true);
 //Loads the years for the select year page
 }else if (strcasecmp($command, 'selectYearLoad') == 0){
-	//This is sloppy but it will be nicer once its SQL
+	//Get the model, fuel and submodel from the session
 	$modelId = $_SESSION['tempModel'];
 	$fuelId = $_SESSION['tempFuel'];
 	$submodelId = $_SESSION['tempSubmodel'];
-	$found1 = false;
-	$found2 = false;
-	foreach($vehicles as &$curVehicle) {
-		if ((($curVehicle['modelId'] == $modelId) && ($curVehicle['fuelId'] == $fuelId)) && ($curVehicle['submodelId'] == $submodelId)){
-			if ($curVehicle['yearId'] == 1000) {
-				$found1 = true;
-			} else if ($curVehicle['yearId'] == 2000) {
-				$found2 = true;
-			}
-		}
-	}
-	unset($curVehicle);
-	$returnedYears = "";
-	if ($found1) {
-		$returnedYears = $years;
+	//Search the databases
+	$query = "  SELECT ylu.*
+		      FROM Year_LU ylu
+		INNER JOIN Vehicle_Type vt
+			ON vt.yearId = ylu.yearId
+		     WHERE vt.modelId = '$modelId'
+		       AND vt.fuelId = '$fuelId'
+		       AND vt.submodelId = '$submodelId'
+		  GROUP BY ylu.yearId";
+	$result = mysql_query ($query)  or die(mysql_error());
+	$years = array();
+	$i = 0;
+	//Return all results or that there was no result
+	while ($row = mysql_fetch_array($result)) {
+		$years[$i] = $row;
+		$i = $i + 1;
+	} 
+	if (!empty($years)) {
+		jsonResponse($years);
 	} else {
-		$returnedYears = array(
-			'0' => $year2
-		);
+		jsonResponse("There are no years matching this filter.");
 	}
-	jsonResponse($returnedYears);
 //Saves the year id from selectYear.js
 } else if (strcasecmp($command, 'selectYearSave') == 0){
 	$selectedYear = "";
@@ -473,7 +353,7 @@ if (strcasecmp($command, 'login') == 0){
 //Loads the vehicles for the current user
 } else if (strcasecmp($command, 'accountVehiclesLoad') == 0){
 	jsonResponse($accountVehicles);
-//Saves the selected vehicle to the session as aparts filter
+//Saves the selected vehicle to the session as a parts filter
 } else if (strcasecmp($command, 'accountVehicleSessionSave') == 0){
 	$serialNumber = '';
 	$selectedVehicle = '';	
