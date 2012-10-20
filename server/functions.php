@@ -3,26 +3,6 @@ session_start();
 mysql_connect('localhost','cs4911_team20','qqtgyu0O') or die( "Unable to connect");
 mysql_select_db('cs4911_team20') or die( "Unable to select database");
 $command = "";
-$accountVehicle1 = array(
-	"found" => true,
-	"serialNumber" => 20,
-	"model" => "TXT",
-	"fuel" => "Electric 48 V",
-	"sub_model" => "Submodel A",
-	"year" => "2012"
-);
-$accountVehicle2 = array(
-	"found" => true,
-	"serialNumber" => 30,
-	"model" => "Express",
-	"fuel" => "Gas",
-	"sub_model" => "Submodel B",
-	"year" => "2005"
-);
-$accountVehicles = array(
-	'0' => $accountVehicle1,
-	'1' => $accountVehicle2
-);
 /* A list of all possible com values in the order they appear below
 	login - Checks user name and password, saves user to session if successful
 	serialsearch - Checks the serial number against known serial numbers and saves
@@ -50,6 +30,8 @@ $accountVehicles = array(
 	selectCategorySave - Saves the category from select part
 	selectSubcategoryLoad - Loads the subcategories
 	selectSubcategorySave - Saves the subcategory from select part
+	vehicleResultsAccountSave - Saves the vehicle to the account
+	accountVehicleRemove - Removes a vehicle from an account
  */
 
 /* A list of all the session variables
@@ -87,8 +69,8 @@ if (isset($request['com'])){
 }
 
 //Checks the login info from login.js
-if (strcasecmp($command, 'login') == 0){
-	$uname = "";
+if (strcasecmp($command, 'login') == 0) {
+	/*$uname = "";
 	$pword = "";
         $data = array();
 	if (isset($request['username']) && isset($request['password'])){
@@ -100,7 +82,24 @@ if (strcasecmp($command, 'login') == 0){
         $output = do_post_request($data);
         print_r($output);
         echo($output);
-        return $output;
+        return $output;*/
+     	$uname = $request['username'];
+     	$pword = $request['password'];
+ 	  	
+	$query = "      SELECT  accountId,
+				userName
+			  FROM  Account
+			 WHERE  userName = '$uname'
+			   AND  password = '$pword'";
+	$result = mysql_query ($query)  or die(mysql_error());
+	//Return either the result or that there was no result
+	if ($row = mysql_fetch_array($result)) {
+    		$_SESSION['uname'] = $row['userName'];	  	
+    		$_SESSION['uid'] = $row['accountId'];	  	
+		jsonResponse(true);
+	} else {
+		jsonResponse("Username and password did not match.");
+	}
 //Loads info for the serial number search in myVehicle.js
 }else if (strcasecmp($command, 'serialsearch') == 0){
 	$serial = "";
@@ -179,24 +178,24 @@ if (strcasecmp($command, 'login') == 0){
 //Cancels the vehicle results by removing the temp serial number
 } else if (strcasecmp($command, 'vehicleResultsCancel') == 0){
 	//Remove the temporary serial number
-	$_SESSION['tempSerialNumber'] = "";
-	$_SESSION['tempModel'] = "";
-	$_SESSION['tempFuel'] = "";
-	$_SESSION['tempSubmodel'] = "";
-	$_SESSION['tempYear'] = "";
-	$_SESSION['tempVehicle'] = "";	
+	unset($_SESSION['tempSerialNumber']);
+	unset($_SESSION['tempModel']);
+	unset($_SESSION['tempFuel']);
+	unset($_SESSION['tempSubmodel']);
+	unset($_SESSION['tempYear']);
+	unset($_SESSION['tempVehicle']);	
 	jsonResponse(true);
 //Saves the selected vehicle to the session
 } else if (strcasecmp($command, 'vehicleResultsSessionSave') == 0){
 	$serialNumber = $_SESSION['tempSerialNumber'];	
 	$vehicle = $_SESSION['tempVehicle'];	
 	//Remove the temporary serial number
-	$_SESSION['tempSerialNumber'] = "";
-	$_SESSION['tempModel'] = "";
-	$_SESSION['tempFuel'] = "";
-	$_SESSION['tempSubmodel'] = "";
-	$_SESSION['tempYear'] = "";
-	$_SESSION['tempVehicle'] = "";	
+	unset($_SESSION['tempSerialNumber']);
+	unset($_SESSION['tempModel']);
+	unset($_SESSION['tempFuel']);
+	unset($_SESSION['tempSubmodel']);
+	unset($_SESSION['tempYear']);
+	unset($_SESSION['tempVehicle']);	
 	$_SESSION['currentSerialNumber'] = $serialNumber;
 	$_SESSION['currentVehicle'] = $vehicle;	
 	jsonResponse(true);
@@ -214,8 +213,8 @@ if (strcasecmp($command, 'login') == 0){
 //Removes the parts filter by removing the current serial number in the session
 } else if (strcasecmp($command, 'vehicleFilterCancel') == 0){
 	//Remove the session serial number
-	$_SESSION['currentSerialNumber'] = "";
-	$_SESSION['currentVehicle'] = "";
+	unset($_SESSION['currentSerialNumber']);
+	unset($_SESSION['currentVehicle']);
 	jsonResponse(true);
 //Loads the models for the select model page
 }else if (strcasecmp($command, 'selectModelLoad') == 0){
@@ -347,27 +346,73 @@ if (strcasecmp($command, 'login') == 0){
 	jsonResponse(true);
 //Logs the user out of the session
 } else if (strcasecmp($command, 'logout') == 0){
-	$_SESSION['uname'] = $uname;
-	$_SESSION['uid'] = 0;
+	unset($_SESSION['uname']);
+	unset($_SESSION['uid']);
 //Loads the vehicles for the current user
-} else if (strcasecmp($command, 'accountVehiclesLoad') == 0){
-	jsonResponse($accountVehicles);
+} else if (strcasecmp($command, 'accountVehiclesLoad') == 0) {
+	$accountId = $_SESSION['uid'];
+	//Search the databases
+	$query = "          SELECT vt.serialNumber,
+				   mlu.name as model,
+				   flu.name as fuel,
+				   slu.name as submodel,
+				   ylu.name as year
+			      FROM Account_Vehicle av
+			INNER JOIN Vehicle_Type vt
+				ON av.serialNumber = vt.serialNumber
+			INNER JOIN Model_LU mlu
+				ON mlu.modelId = vt.modelId
+			INNER JOIN Fuel_LU flu
+				ON flu.fuelId = vt.fuelId
+			INNER JOIN Submodel_LU slu
+				ON slu.submodelId = vt.submodelId
+			INNER JOIN Year_LU ylu
+				ON ylu.yearId = vt.yearId
+			     WHERE av.accountId = '$accountId'";
+	$result = mysql_query ($query)  or die(mysql_error());
+	$vehicles = array();
+	$i = 0;
+	//Return all results or that there was no result
+	while ($row = mysql_fetch_array($result)) {
+		$vehicles[$i] = $row;
+		$i = $i + 1;
+	} 
+	if (!empty($vehicles)) {
+		jsonResponse($vehicles);
+	} else {
+		jsonResponse("There are no years matching this filter.");
+	}
 //Saves the selected vehicle to the session as a parts filter
 } else if (strcasecmp($command, 'accountVehicleSessionSave') == 0){
-	$serialNumber = '';
-	$selectedVehicle = '';	
 	if (isset($request['serialNumber'])){
 		$serialNumber = $request['serialNumber'];
 	}
-	foreach($accountVehicles as &$curVehicle) {
-		if ($curVehicle['serialNumber'] == $serialNumber) {
-			$selectedVehicle = $curVehicle;
-		}
+	$query = "    SELECT vt.serialNumber,
+				   mlu.name as model,
+				   flu.name as fuel,
+				   slu.name as submodel,
+				   ylu.name as year
+			      FROM Vehicle_Type vt
+			INNER JOIN Model_LU mlu
+				ON mlu.modelId = vt.modelId
+			INNER JOIN Fuel_LU flu
+				ON flu.fuelId = vt.fuelId
+			INNER JOIN Submodel_LU slu
+				ON slu.submodelId = vt.submodelId
+			INNER JOIN Year_LU ylu
+				ON ylu.yearId = vt.yearId 
+			     WHERE vt.serialNumber = '$serialNumber'";
+	//Run the query
+	$result = mysql_query ($query)  or die(mysql_error());
+	//Return either the result or that there was no result
+	if ($row = mysql_fetch_array($result)) {
+		$row['found'] = true;
+		$_SESSION['currentSerialNumber'] = $row['serialNumber'];
+		$_SESSION['currentVehicle'] = $row;
+		jsonResponse($row);
+	} else {
+		jsonResponse("There was an error in the session.");
 	}
-	unset($curVehicle);
-	$_SESSION['currentSerialNumber'] = $serialNumber;
-	$_SESSION['currentVehicle'] = $selectedVehicle;
-	jsonResponse($_SESSION['currentVehicle']);
 //Searches the parts bases on a given string
 } else if (strcasecmp($command, 'partsSearch') == 0) {
 //Check for a vehicle filter
@@ -476,7 +521,7 @@ if (strcasecmp($command, 'login') == 0){
 	if (!empty($categories)) {
 		jsonResponse($categories);
 	} else {
-		jsonResponse("Error loading parts categories.");
+		jsonResponse("No parts categories.");
 	}
 //Loads the part search results	
 } else if (strcasecmp($command, 'partsSearchLoadResults') == 0) {
@@ -677,6 +722,40 @@ if (strcasecmp($command, 'login') == 0){
 		$selectedSubcategory = $request['subcategory'];
 	}
 	$_SESSION['tempSubcategory'] = $selectedSubcategory;
+	jsonResponse(true);
+//Saves the vehicle to the account
+} else if (strcasecmp($command, 'vehicleResultsAccountSave') == 0) {
+	$accountId = $_SESSION['uid'];
+	//Make sure the user is logged in.
+	if (empty($accountId)) {
+		jsonResponse("Login to save a vehicle to your account.");
+	}
+	$serialNumber = $_SESSION['tempSerialNumber'];	
+	$vehicle = $_SESSION['tempVehicle'];	
+	//Remove the temporary serial number
+	unset($_SESSION['tempSerialNumber']);
+	unset($_SESSION['tempModel']);
+	unset($_SESSION['tempFuel']);
+	unset($_SESSION['tempSubmodel']);
+	unset($_SESSION['tempYear']);
+	unset($_SESSION['tempVehicle']);	
+	//Save to account
+	$query = " INSERT INTO Account_Vehicle
+     			VALUES ($accountId, $serialNumber)";
+	$result = mysql_query ($query)  or die(mysql_error());
+	jsonResponse(true);
+//Removes vehicle from account
+} else if (strcasecmp($command, 'accountVehicleRemove') == 0) {
+	$accountId = $_SESSION['uid'];
+	$serialNumber = "";
+	//Make sure the user is logged in.
+	if (isset($request['serial'])){
+		$serialNumber = $request['serial'];
+	}
+	$query = " DELETE FROM Account_Vehicle
+      			 WHERE accountId = '$accountId'
+      			   AND serialNumber = '$serialNumber'";
+	$result = mysql_query ($query)  or die(mysql_error());
 	jsonResponse(true);
 }
 function jsonResponse($param, $print = true, $header = true) {
