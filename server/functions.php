@@ -30,7 +30,7 @@ $accountVehicles = array(
 	vehicleResultsLoad - Loads the information of the vehicle about to be selected
 	vehicleResultsCancel - Clears the info about the vehicle about to be selected
 	vehicleResultsSessionSave - Saves the selected vehicle to the session for filtering
-	partsLoad - Loads the currently selected filter for the parts page
+	partsFilterLoad - Loads the currently selected filter for the parts page
 	vehicleFilterCancel - Removes the current vehicle filter from the session
 	selectModelLoad - Loads the possible model choices for select vehicle
 	selectModelSave - Saves the model selection from select vehicle	
@@ -42,13 +42,25 @@ $accountVehicles = array(
 	selectYearSave - Saves the year selection from select vehicle	
 	logout - Logs out the user
 	accountVehiclesLoad - Loads the vehicles for the current account
+	partsSearch - Searchs for a part
+	partCategoryLoad - Loads the part categories for the parts page
+	partsSearchLoadResults - Loads the search results for the parts
+	partsSearchSelectPart - Saves the part number to be viewed later
+	partInfoLoad - Loads the part info for the partInfo page
+	selectCategorySave - Saves the category from select part
+	selectSubcategoryLoad - Loads the subcategories
+	selectSubcategorySave - Saves the subcategory from select part
  */
 
 /* A list of all the session variables
+	currentPartNumber - The part number the user wants to view
 	currentSerialNumber - The serial number of the vehicle currently saved in
 		the session for parts filtering
 	currentVehicle - The info of the vehicle currently saved in
 		the session for parts filtering
+	partSearchQuery - The characters used to search for parts
+	tempCategory - The category selected in select part
+	tempSubcategory - The subcategory selected in select part
 	tempFuel - The fuel selected in select vehicle
 	tempModel - The model id selected in select vehicle
 	tempSerialNumber - The serial number of the vehicle that needs to be confirmed
@@ -125,8 +137,7 @@ if (strcasecmp($command, 'login') == 0){
 } else if (strcasecmp($command, 'vehicleResultsLoad') == 0){
 	//Get the serial number from the session
 	$serial = $_SESSION['tempSerialNumber'];
-	if (!empty($serial)){
-		$query = "    SELECT vt.serialNumber,
+	$query = "    SELECT vt.serialNumber,
 				   mlu.name as model,
 				   flu.name as fuel,
 				   slu.name as submodel,
@@ -139,29 +150,17 @@ if (strcasecmp($command, 'login') == 0){
 			INNER JOIN Submodel_LU slu
 				ON slu.submodelId = vt.submodelId
 			INNER JOIN Year_LU ylu
-				ON ylu.yearId = vt.yearId
-			     WHERE vt.serialNumber = '$serial'";
+				ON ylu.yearId = vt.yearId ";
+	if (!empty($serial)){
+		$query = $query . " WHERE vt.serialNumber = '$serial'";
 	}else { 
 		//Use a different query if picked from the select screens
 		$modelId = $_SESSION['tempModel'];
 		$fuelId = $_SESSION['tempFuel'];
 		$submodelId = $_SESSION['tempSubmodel'];
 		$yearId = $_SESSION['tempYear'];
-		$query = "  SELECT vt.serialNumber,
-				   mlu.name as model,
-				   flu.name as fuel,
-				   slu.name as submodel,
-				   ylu.name as year
-			      FROM Vehicle_Type vt
-			INNER JOIN Model_LU mlu
-				ON mlu.modelId = vt.modelId
-			INNER JOIN Fuel_LU flu
-				ON flu.fuelId = vt.fuelId
-			INNER JOIN Submodel_LU slu
-				ON slu.submodelId = vt.submodelId
-			INNER JOIN Year_LU ylu
-				ON ylu.yearId = vt.yearId
-			     WHERE vt.modelId = '$modelId'
+		$query = $query .
+			     "WHERE vt.modelId = '$modelId'
 			       AND vt.fuelId = '$fuelId'
 			       AND vt.submodelId = '$submodelId'
 			       AND vt.yearId = '$yearId'";
@@ -202,7 +201,7 @@ if (strcasecmp($command, 'login') == 0){
 	$_SESSION['currentVehicle'] = $vehicle;	
 	jsonResponse(true);
 //Loads the filter for the parts page
-} else if (strcasecmp($command, 'partsLoad') == 0){
+} else if (strcasecmp($command, 'partsFilterLoad') == 0){
 	//Get the serial number from the session
 	$serial = $_SESSION['currentSerialNumber'];
 	$vehicle = $_SESSION['currentVehicle'];
@@ -369,9 +368,317 @@ if (strcasecmp($command, 'login') == 0){
 	$_SESSION['currentSerialNumber'] = $serialNumber;
 	$_SESSION['currentVehicle'] = $selectedVehicle;
 	jsonResponse($_SESSION['currentVehicle']);
+//Searches the parts bases on a given string
+} else if (strcasecmp($command, 'partsSearch') == 0) {
+//Check for a vehicle filter
+	$part = "";
+	if (isset($request['part'])){
+		$part = $request['part'];	
+	}
+	//Search the database	
+	$query = "
+		SELECT Results.rank,
+		       p.partNumber,
+		       p.name,
+		       p.price,
+		       p.description,
+		       pslu.name AS subcategoryName,
+		       plu.name AS categoryName,
+		       alu.name AS availability
+		FROM(
+		(
+			SELECT 1 AS rank,
+			       partNumber
+			  FROM Part
+			 WHERE partNumber = '$part'
+		)
+		UNION
+		(
+			SELECT 2 AS rank,
+			       partNumber
+			  FROM Part
+			 WHERE UPPER(name) = UPPER('$part')
+		)
+		UNION
+		(
+			SELECT 3 AS rank,
+			       partNumber
+			  FROM Part
+			 WHERE partNumber LIKE '$part%'
+		)
+		UNION
+		(
+			SELECT 4 AS rank,
+			       partNumber
+			  FROM Part
+			 WHERE UPPER(name) LIKE UPPER('$part%')
+		)
+		UNION
+		(
+			SELECT 5 AS rank,
+			       partNumber
+			  FROM Part
+			 WHERE partNumber LIKE '%$part%'
+		)
+		UNION
+		(
+			SELECT 6 AS rank,
+			       partNumber
+			  FROM Part
+			 WHERE UPPER(name) LIKE UPPER('%$part%')
+		)
+		) AS Results
+		INNER JOIN Part p
+			ON p.partNumber = Results.partNumber
+		INNER JOIN Part_Subcategory_LU pslu
+			ON p.partSubcategoryId = pslu.subcategoryId
+		INNER JOIN Part_Category_LU plu
+			ON pslu.categoryId = plu.categoryId
+		INNER JOIN Availability_LU alu
+			ON p.availabilityId = alu.availabilityId
+		  GROUP BY Results.partNumber
+		    HAVING MIN(rank)
+		  ORDER BY Results.rank ASC, Results.partNumber ASC";          
+	$result = mysql_query ($query)  or die(mysql_error());
+	//Save the search
+	if ($row = mysql_fetch_array($result)) {
+		$_SESSION['partSearchQuery'] = $part;
+		jsonResponse(true);
+	} else {
+		jsonResponse("There were no results.");
+	}
+//Loads the parts categories for the parts category page
+} else if (strcasecmp($command, 'partCategoryLoad') == 0) {
+	//Check for a vehicle filter
+	$filter = $_SESSION['currentSerialNumber'];
+	//Get the categories from the database
+	$query = "  SELECT pclu.*
+		      FROM Part_Category_LU pclu";
+	if(!empty($filter)) {
+		$query = $query . 
+		       " INNER JOIN Part_Subcategory_LU pslu
+				ON pclu.categoryId = pslu.categoryId
+			INNER JOIN Part p
+				ON p.partSubcategoryId = pslu.subcategoryId
+			INNER JOIN Vehicle_Type_Part vtp
+				ON vtp.partNumber = p.partNumber
+			     WHERE vtp.serialNumber = '$filter'
+			  GROUP BY pclu.categoryId";
+	}
+	$result = mysql_query ($query)  or die(mysql_error());
+	$categories = array();
+	$i = 0;
+	//Return all results or that there was no result
+	while ($row = mysql_fetch_array($result)) {
+		$categories[$i] = $row;
+		$i = $i + 1;
+	} 
+	if (!empty($categories)) {
+		jsonResponse($categories);
+	} else {
+		jsonResponse("Error loading parts categories.");
+	}
+//Loads the part search results	
+} else if (strcasecmp($command, 'partsSearchLoadResults') == 0) {
+	$part = $_SESSION['partSearchQuery'];
+	//Search the database	
+	if (!empty($part)) {
+		$query = "
+			SELECT Results.rank,
+			       p.partNumber,
+			       p.name,
+			       p.price,
+			       p.description,
+			       pslu.name AS subcategoryName,
+			       plu.name AS categoryName,
+			       alu.name AS availability
+			FROM(
+			(
+				SELECT 1 AS rank,
+				       partNumber
+				  FROM Part
+				 WHERE partNumber = '$part'
+			)
+			UNION
+			(
+				SELECT 2 AS rank,
+				       partNumber
+				  FROM Part
+				 WHERE UPPER(name) = UPPER('$part')
+			)
+			UNION
+			(
+				SELECT 3 AS rank,
+				       partNumber
+				  FROM Part
+				 WHERE partNumber LIKE '$part%'
+			)
+			UNION
+			(
+				SELECT 4 AS rank,
+				       partNumber
+				  FROM Part
+				 WHERE UPPER(name) LIKE UPPER('$part%')
+			)
+			UNION
+			(
+				SELECT 5 AS rank,
+				       partNumber
+				  FROM Part
+				 WHERE partNumber LIKE '%$part%'
+			)
+			UNION
+			(
+				SELECT 6 AS rank,
+				       partNumber
+				  FROM Part
+				 WHERE UPPER(name) LIKE UPPER('%$part%')
+			)
+			) AS Results
+			INNER JOIN Part p
+				ON p.partNumber = Results.partNumber
+			INNER JOIN Part_Subcategory_LU pslu
+				ON p.partSubcategoryId = pslu.subcategoryId
+			INNER JOIN Part_Category_LU plu
+				ON pslu.categoryId = plu.categoryId
+			INNER JOIN Availability_LU alu
+				ON p.availabilityId = alu.availabilityId
+			  GROUP BY Results.partNumber
+			    HAVING MIN(rank)
+			  ORDER BY Results.rank ASC, Results.partNumber ASC";   
+	} else {
+		$filter = $_SESSION['currentSerialNumber'];
+		$subcategory = $_SESSION['tempSubcategory'];
+		$query = "  SELECT p.partNumber,
+				   p.name,
+				   p.price,
+				   p.description,
+				   pslu.name AS subcategoryName,
+				   plu.name AS categoryName,
+				   alu.name AS availability
+			      FROM Part p";
+		if (!empty($filter)) {
+			$query = $query . " INNER JOIN Vehicle_Type_Part vtp
+				ON p.partNumber = vtp.partNumber";
+		}
+			$query = $query . " INNER JOIN Part_Subcategory_LU pslu
+				ON p.partSubcategoryId = pslu.subcategoryId
+			INNER JOIN Part_Category_LU plu
+				ON pslu.categoryId = plu.categoryId
+			INNER JOIN Availability_LU alu
+				ON p.availabilityId = alu.availabilityId
+			     WHERE p.partSubcategoryId = '$subcategory'";
+
+		if (!empty($filter)) {
+			$query = $query . " AND vtp.serialNumber = '$filter'";
+		}
+	}       
+	$result = mysql_query ($query)  or die(mysql_error());
+	$parts = array();
+	$i = 0;
+	//Save the search
+	while ($row = mysql_fetch_array($result)) {
+		$parts[$i] = $row;
+		$i = $i + 1;
+	} 
+	if (!empty($parts)) {
+		jsonResponse($parts);
+	} else {
+		jsonResponse("There are no results. $query");
+	}
+//Saves the specific part for later loading
+} else if (strcasecmp($command, 'partsSearchSelectPart') == 0) {
+	$selectedPart = "";
+	if (isset($request['part'])){
+		$selectedPart = $request['part'];
+	}
+	$_SESSION['currentPartNumber'] = $selectedPart;
+	//Clear the search filters
+	$_SESSION['partSearchQuery'] = "";
+	$_SESSION['tempSubcategory'] = "";
+	$_SESSION['tempCategory'] = "";
+	jsonResponse(true);
+//Loads the part info for the part info results
+} else if (strcasecmp($command, 'partInfoLoad') == 0) {
+	//Get the part number from the session
+	$part = $_SESSION['currentPartNumber'];
+	$query = "          SELECT p.partNumber,
+				   p.name,
+				   p.price,
+				   p.description,
+				   pslu.name AS subcategoryName,
+				   plu.name AS categoryName,
+				   alu.name AS availability
+			      FROM Part p
+			INNER JOIN Part_Subcategory_LU pslu
+				ON p.partSubcategoryId = pslu.subcategoryId
+			INNER JOIN Part_Category_LU plu
+				ON pslu.categoryId = plu.categoryId
+			INNER JOIN Availability_LU alu
+				ON p.availabilityId = alu.availabilityId
+			     WHERE p.partNumber = '$part'"; 
+	//Run the query
+	$result = mysql_query ($query)  or die(mysql_error());
+	//Return either the result or that there was no result
+	if ($row = mysql_fetch_array($result)) {
+		$row['found'] = true;
+		jsonResponse($row);
+	} else {
+		jsonResponse("There was an error in the session.");
+	}
+//Saves the category to the session for future use
+} else if (strcasecmp($command, 'selectCategorySave') == 0) {
+	$selectedCategory = "";
+	if (isset($request['category'])){
+		$selectedCategory = $request['category'];
+	}
+	$_SESSION['tempCategory'] = $selectedCategory;
+	jsonResponse(true);
+//Loads the list of subcategories
+} else if (strcasecmp($command, 'selectSubcategoryLoad') == 0) {
+	//Check for a vehicle filter
+	$filter = $_SESSION['currentSerialNumber'];
+	$category = $_SESSION['tempCategory'];
+	//Get the subcategories from the database
+	$query = "SELECT pslu.subcategoryId,
+                         pslu.name
+                    FROM Part_Subcategory_LU pslu";
+	if(!empty($filter)) {
+		$query = $query . 
+		      " INNER JOIN Part_Category_LU pclu
+				ON pslu.categoryId = pclu.categoryId
+			INNER JOIN Part p
+				ON p.partSubcategoryId = pslu.subcategoryId
+			INNER JOIN Vehicle_Type_Part vtp
+				ON vtp.partNumber = p.partNumber";
+	} 
+	$query = $query . " WHERE pslu.categoryId = '$category'";
+	if (!empty($filter)) {
+		$query = $query . " AND vtp.serialNumber = '$filter'
+			  GROUP BY pslu.subcategoryId";
+	}
+	$result = mysql_query ($query)  or die(mysql_error());
+	$categories = array();
+	$i = 0;
+	//Return all results or that there was no result
+	while ($row = mysql_fetch_array($result)) {
+		$categories[$i] = $row;
+		$i = $i + 1;
+	} 
+	if (!empty($categories)) {
+		jsonResponse($categories);
+	} else {
+		jsonResponse("Error loading parts subcategories.");
+	}
+//Saves the subcategory that was selected
+} else if (strcasecmp($command, 'selectSubcategorySave') == 0) {
+	$selectedSubcategory = "";
+	if (isset($request['subcategory'])){
+		$selectedSubcategory = $request['subcategory'];
+	}
+	$_SESSION['tempSubcategory'] = $selectedSubcategory;
+	jsonResponse(true);
 }
-
-
 function jsonResponse($param, $print = true, $header = true) {
     if (is_array($param)) {
         $out = array(
