@@ -18,13 +18,12 @@ function login() {
             	$('#loginResult').text("Unable to log in");
 	    } else {
 		//Continue to the account page
-		var path = window.location.pathname;
-		var authorized = response.data.auth;
+		/*var authorized = response.data.auth;
 		var accountID = "";
 		alert("Success: " + success + " auth: " + authorized);
 		if (authorized == true)
-		    accountID = response.data.accountID;
-		
+		    accountID = response.data.accountID;*/
+		var path = window.location.pathname;
 		path = path.substring(0, path.lastIndexOf('/'));
 		window.location = path + "/myAccount.html";
 	    }

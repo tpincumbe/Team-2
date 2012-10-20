@@ -29,10 +29,9 @@ $.ajax({
         }
     });
 
-//Save the vehicle to the session and go to the parts page
+//Save the part to the account
 function addToCart() {
-alert("To implement- Add to cart");
-/*$.ajax({
+$.ajax({
         url: "server/functions.php",
         type: "post",
         context: document.body,
@@ -41,14 +40,11 @@ alert("To implement- Add to cart");
 		//Transition to the parts page		
 		var path = window.location.pathname;
 		path = path.substring(0, path.lastIndexOf('/'));
-		window.location = path + "/cart.html";
+		window.location = path + "/shoppingCart.html";
         },
         error: function(jqXHR, textStatus, errorThrown){
             // log the error to the console
-            console.log(
-                "The following error occured: "+
-                textStatus, errorThrown
-            );
+		alert("You must be logged in to use the shopping cart.");
         }
-    });*/
+    });
 }

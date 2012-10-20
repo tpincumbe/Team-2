@@ -52,7 +52,22 @@ $.ajax({
 
 //Saves the vehicle to the logged in account
 function saveToAccount() {
-	alert("To be implemented- Save to account");
+$.ajax({
+        url: "server/functions.php",
+        type: "post",
+        context: document.body,
+        data: {'com': 'vehicleResultsAccountSave'},
+        success: function(response, textStatus, jqXHR){
+		//Transition to the account vehicles page		
+		var path = window.location.pathname;
+		path = path.substring(0, path.lastIndexOf('/'));
+		window.location = path + "/accountVehicles.html";
+        },
+        error: function(jqXHR, textStatus, errorThrown){
+            //Alert the user they must log in
+		alert("You must be logged in to save a vehicle.");
+        }
+    });
 }
 
 //Save the vehicle to the session and go to the parts page
