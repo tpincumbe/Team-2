@@ -8,7 +8,7 @@ switch($_SERVER['REQUEST_METHOD']){
     case 'POST': $request = &$_POST; break;
     default: $request = &$_GET;
 }
-        
+
 //runs the correct function based on a command
 if (isset($request['command'])){
     $command = $request['command'];
@@ -29,7 +29,6 @@ function authenticate($uname, $pwd){
     $dbQuery = sprintf("SELECT accountID,password FROM Account where userName ='" . $uname . "'");
     $result = getDBResultRecord($dbQuery);
     $output = "";
-    
     if (!$result) {
         $output = array("auth" => FALSE);  
     }else {
@@ -44,7 +43,6 @@ function authenticate($uname, $pwd){
             }
         }
     }
-    
     jsonResponse($output);
 }
 
@@ -71,9 +69,7 @@ function jsonResponse($param, $print = true, $header = true) {
             )
         );
     }
- 
     $out = json_encode($out);
- 
     if ($print) {
         if ($header) header('Content-type: application/json');
  

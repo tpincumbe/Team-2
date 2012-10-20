@@ -8,8 +8,11 @@ function login() {
         context: document.body,
         data: {'com': 'login', 'username': uname, 'password': pwd},
         success: function(response, textStatus, jqXHR){
+	    alert("Response: " + response);
             //Finsih this function to parse json response.
+	    //alert(JQuery.parseJSON(response));
             var success = response.success;
+	    alert("Success: " + success);
 	    if (!success) {
             	var error = response.errors.reason;
             	$('#loginResult').text("Unable to log in");
@@ -18,6 +21,7 @@ function login() {
 		var path = window.location.pathname;
 		var authorized = response.data.auth;
 		var accountID = "";
+		alert("Success: " + success + " auth: " + authorized);
 		if (authorized == true)
 		    accountID = response.data.accountID;
 		
