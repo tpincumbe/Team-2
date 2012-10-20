@@ -12,7 +12,7 @@
 <div data-role="page">
 	<!-- All scripts that need to run on page change go here -->
 	<script type="text/javascript" src="javascript/loginHeader.js"></script>
-	<script type="text/javascript" src="javascript/accountVehicles.js"></script>
+	<script type="text/javascript" src="javascript/shoppingCart.js"></script>
 	<!-- End scripts -->
 	<div data-role="header" data-id="headerBar" data-position="fixed">
 		<h1><image src="images/shopezgomainlogo.jpg"/></h1>
@@ -29,9 +29,13 @@
 
 	</div><!-- /header -->
 
-	<div data-role="content" data-id="accountVehiclesContentDiv">
-		<div id = "accountVehiclesContent" name = "accountVehiclesContent" >
-			Error		
+	<div data-role="content" data-id="shoppingCartContentDiv">
+		<div id="totalCost" name="totalCost"></div>
+		<button onClick="checkout()">Checkout</button>
+		</br>
+		</br>
+		<div id = "productList" name = "productList" >
+			No items		
 		</div>
 	</div><!-- /content -->
 

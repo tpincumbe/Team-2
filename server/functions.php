@@ -32,6 +32,9 @@ $command = "";
 	selectSubcategorySave - Saves the subcategory from select part
 	vehicleResultsAccountSave - Saves the vehicle to the account
 	accountVehicleRemove - Removes a vehicle from an account
+	shoppingCartLoad - Loads the shopping cart for the current user
+	addToCart - Adds an item to the shopping cart
+	shoppingCartRemove - Removes item from shopping cart
  */
 
 /* A list of all the session variables
@@ -740,7 +743,7 @@ if (strcasecmp($command, 'login') == 0) {
 	unset($_SESSION['tempYear']);
 	unset($_SESSION['tempVehicle']);	
 	//Save to account
-	$query = " INSERT INTO Account_Vehicle
+	$query = " INSERT INTO Account_Vehicle (accountId, serialNumber)
      			VALUES ($accountId, $serialNumber)";
 	$result = mysql_query ($query)  or die(mysql_error());
 	jsonResponse(true);
@@ -752,12 +755,82 @@ if (strcasecmp($command, 'login') == 0) {
 	if (isset($request['serial'])){
 		$serialNumber = $request['serial'];
 	}
-	$query = " DELETE FROM Account_Vehicle
-      			 WHERE accountId = '$accountId'
-      			   AND serialNumber = '$serialNumber'";
+	$query = "  DELETE FROM Account_Vehicle
+			  WHERE accountId = '$accountId'
+      			    AND serialNumber = '$serialNumber'
+      			  LIMIT 1";
+	$result = mysql_query ($query)  or die(mysql_error());
+	jsonResponse(true);
+//Load shopping cart
+} else if (strcasecmp($command, 'shoppingCartLoad') == 0) {
+	$accountId = $_SESSION['uid'];
+	$query = "  SELECT p.partNumber,
+			   p.name,
+			   p.price,
+			   p.description,
+			   pslu.name AS subcategoryName,
+			   plu.name AS categoryName,
+			   alu.name AS availability
+		      FROM Shopping_Cart sc
+		INNER JOIN Part p
+			ON sc.partNumber = p.partNumber
+		INNER JOIN Part_Subcategory_LU pslu
+			ON p.partSubcategoryId = pslu.subcategoryId
+		INNER JOIN Part_Category_LU plu
+			ON pslu.categoryId = plu.categoryId
+		INNER JOIN Availability_LU alu
+			ON p.availabilityId = alu.availabilityId
+		     WHERE sc.accountId = '$accountId'";
+	$result = mysql_query ($query)  or die(mysql_error());
+	$items = array();
+	$i = 0;
+	//Return all results or that there was no result
+	while ($row = mysql_fetch_array($result)) {
+		$items[$i] = $row;
+		$i = $i + 1;
+	} 
+	if (!empty($items)) {
+		jsonResponse($items);
+	} else {
+		jsonResponse("Error loading parts subcategories.");
+	}
+//Add part to shopping cart
+} else if (strcasecmp($command, 'addToCart') == 0) {
+	$accountId = $_SESSION['uid'];
+	//Make sure the user is logged in.
+	if (empty($accountId)) {
+		jsonResponse("Login to use the shopping cart.");
+	}
+	$partNumber = $_SESSION['currentPartNumber'];	
+	//Remove the temporary serial number
+	unset($_SESSION['currentPartNumber']);	
+	//Save to account
+	$query = " INSERT INTO Shopping_Cart (accountId, partNumber)
+     			VALUES ($accountId, $partNumber)";
+	$result = mysql_query ($query)  or die(mysql_error());
+	jsonResponse(true);
+//Remove part from shopping cart
+} else if (strcasecmp($command, 'shoppingCartRemove') == 0) {
+	$accountId = $_SESSION['uid'];
+	$partNumber = "";
+	if (isset($request['part'])){
+		$partNumber = $request['part'];
+	}
+	$query = "  DELETE FROM Shopping_Cart
+			  WHERE accountId = '$accountId'
+      			    AND partNumber = '$partNumber'
+      			  LIMIT 1";
+	$result = mysql_query ($query)  or die(mysql_error());
+	jsonResponse(true);
+//Removes everything from shopping cart for checkout
+} else if (strcasecmp($command, 'checkout') == 0) {
+	$accountId = $_SESSION['uid'];
+	$query = "  DELETE FROM Shopping_Cart
+			  WHERE accountId = '$accountId'";
 	$result = mysql_query ($query)  or die(mysql_error());
 	jsonResponse(true);
 }
+
 function jsonResponse($param, $print = true, $header = true) {
     if (is_array($param)) {
         $out = array(

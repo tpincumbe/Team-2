@@ -11,3 +11,10 @@ function accountVehicles() {
 	path = path.substring(0, path.lastIndexOf('/'));
 	window.location = path + "/accountVehicles.html";
 }
+
+//Redirects to the shopping cart page
+function shoppingCart() {
+    	var path = window.location.pathname;
+	path = path.substring(0, path.lastIndexOf('/'));
+	window.location = path + "/shoppingCart.html";
+}
