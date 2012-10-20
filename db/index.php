@@ -1,7 +1,9 @@
 <?php
 include 'db_helper.php';
 
+$queries = parse_ini_file("sql.ini");
 $request = "";
+
 //Finds the type or the request (get or post)
 switch($_SERVER['REQUEST_METHOD']){
     case 'GET': $request = &$_GET; break;
@@ -26,22 +28,20 @@ if (isset($request['command'])){
  * returns the account id if the user has been authenticated.
  */
 function authenticate($uname, $pwd){
-    $dbQuery = sprintf("SELECT accountID,password FROM Account where userName ='" . $uname . "'");
+    global $queries;
+    $dbQuery = $queries['authenticate'];
+    $dbQuery = str_replace("/?1", $uname, $dbQuery);
+    $dbQuery = str_replace("/?2" , $pwd, $dbQuery);
+    
     $result = getDBResultRecord($dbQuery);
-    $output = "";
+    $output = array("auth" => FALSE);  
     if (!$result) {
-        $output = array("auth" => FALSE);  
     }else {
-        if (isset($result['password'])){
-            if (strcmp($pwd, $result['password']) == 0){
-                $output = array(
-                    "auth" => TRUE,
-                    "accountID" => $result['accountID']
-                    );
-            }else {
-                $output = array("auth" => FALSE);
-            }
-        }
+        $output = array(
+            "auth" => TRUE,
+            "accountID" => $result['accountID'],
+            "userName" => $result['userName']
+            );
     }
     jsonResponse($output);
 }

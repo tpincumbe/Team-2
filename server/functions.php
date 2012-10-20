@@ -75,7 +75,7 @@ if (isset($request['com'])){
 
 //Checks the login info from login.js
 if (strcasecmp($command, 'login') == 0) {
-	/*$uname = "";
+	$uname = "";
 	$pword = "";
         $data = array();
 	if (isset($request['username']) && isset($request['password'])){
@@ -85,7 +85,7 @@ if (strcasecmp($command, 'login') == 0) {
 	}
         
         $output = do_post_request($data);
-        return $output;*/
+        return $output;/*
      	$uname = $request['username'];
      	$pword = $request['password'];
  	  	
@@ -102,7 +102,7 @@ if (strcasecmp($command, 'login') == 0) {
 		jsonResponse(true);
 	} else {
 		jsonResponse("Username and password did not match.");
-	}
+	}*/
 //Loads info for the serial number search in myVehicle.js
 }else if (strcasecmp($command, 'serialsearch') == 0){
 	$serial = "";
