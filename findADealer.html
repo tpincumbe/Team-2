@@ -7,6 +7,13 @@
 	<script src="http://code.jquery.com/jquery-1.7.1.min.js"></script>
 	<script src="http://code.jquery.com/mobile/1.1.1/jquery.mobile-1.1.1.min.js"></script>
 	
+</head> 
+<body> 
+
+<div data-role="page">
+	<!-- All scripts that need to run on page change go here -->
+	<script type="text/javascript" src="javascript/loginHeader.js"></script>
+	<script type="text/javascript" src="javascript/findDealer.js"></script>
 	<script type="text/javascript"
 		src="http://maps.googleapis.com/maps/api/js?key=AIzaSyBMtjbKML2WeqX7NdNSJWEy06_t7M1DzTU&sensor=false">
 	</script>
@@ -16,13 +23,6 @@
 	 body { height: 100%; margin: 0; padding: 0 }
 	 #map_canvas { height: 100% }
 	</style>
-</head> 
-<body> 
-
-<div data-role="page">
-	<!-- All scripts that need to run on page change go here -->
-	<script type="text/javascript" src="javascript/loginHeader.js"></script>
-	<script type="text/javascript" src="javascript/findDealer.js"></script>
 	<!-- End scripts -->
 	<div data-role="header" data-id="headerBar" data-position="fixed">
 		<h1><img src="images/shopezgomainlogo.jpg"/></h1>
@@ -39,7 +39,7 @@
 
 	</div><!-- /header -->
 
-	<div id="map_canvas" style="width:100%; height:100%; position:absolute;"></div>
+	<div id="map_canvas" name="map_canvas" style="width:100%; height:100%; position:absolute;"></div>
 	<div id="content" data-role="content"></div>
 
 	<div data-role="footer" data-id="footerBar" data-position="fixed"> 
