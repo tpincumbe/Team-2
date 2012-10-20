@@ -1,7 +1,7 @@
 //https://gdata.youtube.com/feeds/api/users/ezgotv/uploads
 var videos = new Array();
 var numVideos = 0;
-$(document).ready(function() {
+$(document).live("pageinit", function() {
   retrieveVideoList();
 });
 
