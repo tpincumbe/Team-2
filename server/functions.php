@@ -1,7 +1,7 @@
 <?php
 session_start();
-mysql_connect('localhost','cs4911_team20','qqtgyu0O') or die( "Unable to connect");
-mysql_select_db('cs4911_team20') or die( "Unable to select database");
+//mysql_connect('localhost','cs4911_team20','qqtgyu0O') or die( "Unable to connect");
+//mysql_select_db('cs4911_team20') or die( "Unable to select database");
 $command = "";
 /* A list of all possible com values in the order they appear below
 	login - Checks user name and password, saves user to session if successful
@@ -85,8 +85,6 @@ if (strcasecmp($command, 'login') == 0) {
 	}
         
         $output = do_post_request($data);
-        print_r($output);
-        echo($output);
         return $output;*/
      	$uname = $request['username'];
      	$pword = $request['password'];
@@ -923,12 +921,9 @@ function jsonResponse($param, $print = true, $header = true) {
 function do_post_request($params, $optional_headers = null){
     $ini = parse_ini_file("init.ini");
     $url = $ini['url'];
-    echo("URL:" . $url . "<br />");
     
     // Build Http query using params
     $query = http_build_query ($params);
-    
-    print_r($query);
     
     // Create Http context details
     $contextData = array ( 
@@ -938,21 +933,11 @@ function do_post_request($params, $optional_headers = null){
         "Content-Length: ".strlen($query)."\r\n",
         'content'=> $query
     );
-    
-    echo("<br/>");
-    print_r($contextData);
-    echo("<br/>");
 
     // Create context resource for our request
     $context = stream_context_create (array ( 'http' => $contextData ));
-    
-    print_r($context);
-    echo("<br/>");
-
     // Read page rendered as result of your POST request
     $result =  file_get_contents ($url, false, $context);
-    
-    print_r($result);
     
     echo $result;
     return;
