@@ -35,6 +35,8 @@ $command = "";
 	shoppingCartLoad - Loads the shopping cart for the current user
 	addToCart - Adds an item to the shopping cart
 	shoppingCartRemove - Removes item from shopping cart
+	loadAccountInfo - Loads the account info for the update account page
+	updateAccount - Updates the account info
  */
 
 /* A list of all the session variables
@@ -829,6 +831,60 @@ if (strcasecmp($command, 'login') == 0) {
 			  WHERE accountId = '$accountId'";
 	$result = mysql_query ($query)  or die(mysql_error());
 	jsonResponse(true);
+//Loads the account info
+} else if (strcasecmp($command, 'loadAccountInfo') == 0) {
+	$accountId = $_SESSION['uid'];
+	$query = "      SELECT email,
+			       offers
+			  FROM Account
+			 WHERE accountId = '$accountId'";
+	$result = mysql_query ($query)  or die(mysql_error());
+	//Return either the result or that there was no result
+	if ($row = mysql_fetch_array($result)) {
+		jsonResponse($row);
+	} else {
+		jsonResponse("Couldn't load account information incorrect.");
+	}
+//Updates account info
+} else if (strcasecmp($command, 'updateAccount') == 0) {
+	$accountId = $_SESSION['uid'];
+	$oldPassword = "";
+	if (isset($request['oldPassword'])){
+		$oldPassword = $request['oldPassword'];
+	}
+	$newPassword = "";
+	if (isset($request['newPassword'])){
+		$newPassword = $request['newPassword'];
+	}
+	$email = "";
+	if (isset($request['email'])){
+		$email = $request['email'];
+	}
+	$offers = "";
+	if (isset($request['offers'])){
+		$offers = $request['offers'];
+	}
+	//Make sure old password is correct
+	$query = "      SELECT *
+			  FROM Account
+			 WHERE accountId = '$accountId'
+			   AND password = '$oldPassword'";
+	$result = mysql_query ($query)  or die(mysql_error());
+	//Make sure there was a result to check password
+	if ($row = mysql_fetch_array($result)) {
+		//Update info
+		$query = "      UPDATE Account
+				   SET email    = '$email',";
+		if (!empty($newPassword)) {			       
+			$query = $query . "password = '$newPassword',";
+		}
+		$query = $query . " offers   = '$offers'
+				 WHERE accountId = '$accountId'";
+		$result = mysql_query ($query)  or die(mysql_error());
+		jsonResponse(true);
+	} else {
+		jsonResponse("Old password did not match account password.");
+	}
 }
 
 function jsonResponse($param, $print = true, $header = true) {

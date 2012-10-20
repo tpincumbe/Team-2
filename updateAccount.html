@@ -15,6 +15,7 @@
 <div data-role="page">
 	<!-- All scripts that need to run on page change go here -->
 	<script type="text/javascript" src="javascript/loginHeader.js"></script>
+	<script type="text/javascript" src="javascript/updateAccount.js"></script>
 	<!-- End scripts -->
 	<div data-role="header" data-id="headerBar" data-position="fixed">
 		<h1><image src="images/shopezgomainlogo.jpg"/></h1>
@@ -32,7 +33,16 @@
 	</div><!-- /header -->
 
 	<div data-role="content">	
-		To be implemented after database access is given.
+		Current Password: 
+		<input type="password" name="oldPasswordField" id="oldPasswordField"/>
+		New Password: 
+		<input type="password" name="newPasswordField" id="newPasswordField"/>
+		Email:
+		<input type="text" name="emailField" id="emailField"/>
+		Offers:
+		<input type="checkbox" name="offersField" id="offersField"/>
+		</br>
+		<button onClick="updateAccount()">Update Account</button>
 	</div><!-- /content -->
 
 	<div data-role="footer" data-id="footerBar" data-position="fixed"> 
