@@ -55,8 +55,8 @@ $command = "";
 	tempSubmodel - The submodel selected in select vehilce
 	tempVehicle - The vehicle (with name strings) selected in select vehicle
 	tempYear - The year selected in select vehicle.
+	uid - The logged in user id	
 	uname - The logged in username
-	uid - The logged in user id
 	
  */
 
@@ -78,31 +78,24 @@ if (strcasecmp($command, 'login') == 0) {
 	$uname = "";
 	$pword = "";
         $data = array();
+	//Call the database
 	if (isset($request['username']) && isset($request['password'])){
             $data['command'] = "authenticate";
 	    $data['username'] = $request['username'];
             $data['password'] = $request['password'];
 	}
-        
         $output = do_post_request($data);
-        return $output;/*
-     	$uname = $request['username'];
-     	$pword = $request['password'];
- 	  	
-	$query = "      SELECT  accountId,
-				userName
-			  FROM  Account
-			 WHERE  userName = '$uname'
-			   AND  password = '$pword'";
-	$result = mysql_query ($query)  or die(mysql_error());
-	//Return either the result or that there was no result
-	if ($row = mysql_fetch_array($result)) {
-    		$_SESSION['uname'] = $row['userName'];	  	
-    		$_SESSION['uid'] = $row['accountId'];	  	
-		jsonResponse(true);
-	} else {
-		jsonResponse("Username and password did not match.");
-	}*/
+	//Decode response
+	$response = json_decode($output, true);
+	//Get data
+	$account = $response['data'];
+	//If login successful, save info to session
+	if($account['auth']) {
+		$_SESSION['uname'] = $account['userName'];	  	
+    		$_SESSION['uid'] = $account['accountID'];
+	}
+	//Return the data array to the client as a json object
+	jsonResponse($account);
 //Loads info for the serial number search in myVehicle.js
 }else if (strcasecmp($command, 'serialsearch') == 0){
 	$serial = "";
@@ -939,7 +932,6 @@ function do_post_request($params, $optional_headers = null){
     // Read page rendered as result of your POST request
     $result =  file_get_contents ($url, false, $context);
     
-    echo $result;
-    return;
+    return $result;
 }
 ?>

@@ -8,25 +8,25 @@ function login() {
         context: document.body,
         data: {'com': 'login', 'username': uname, 'password': pwd},
         success: function(response, textStatus, jqXHR){
-	    var resp = jQuery.parseJSON(response);
+	    //Get the response
+	    var resp = response;
             var success = resp.success;
-	    
+	    //Check for php failer
 	    if (!success) {
             	var error = resp.errors.reason;
+		alert(error);
             	$('#loginResult').text("Unable to log in");
 	    } else {
-		//Continue to the account page
+		//Check for successful login
 		var authorized = resp.data.auth;
-		var accountID = "";
-		var uname = "";
-		
 		if (authorized == true){
-		    accountID = resp.data.accountID;
-		    uname = resp.data.userName;
+		        //Continue to the account page
+			var path = window.location.pathname;
+			path = path.substring(0, path.lastIndexOf('/'));
+			window.location = path + "/myAccount.html";
+		} else {
+			alert("Invalid login");
 		}
-		var path = window.location.pathname;
-		path = path.substring(0, path.lastIndexOf('/'));
-		window.location = path + "/myAccount.html";
 	    }
         },
         error: function(jqXHR, textStatus, errorThrown){
