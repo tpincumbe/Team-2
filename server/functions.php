@@ -1,7 +1,5 @@
 <?php
 session_start();
-//mysql_connect('localhost','cs4911_team20','qqtgyu0O') or die( "Unable to connect");
-//mysql_select_db('cs4911_team20') or die( "Unable to select database");
 $command = "";
 /* A list of all possible com values in the order they appear below
 	login - Checks user name and password, saves user to session if successful
@@ -102,74 +100,51 @@ if (strcasecmp($command, 'login') == 0) {
 	if (isset($request['serial'])){
 		$serial = $request['serial'];	
 	}
-	//Search the database	
-	$query = "
-		    SELECT vt.serialNumber,
-			   mlu.name as model,
-			   flu.name as fuel,
-			   slu.name as submodel,
-			   ylu.name as year
-		      FROM Vehicle_Type vt
-		INNER JOIN Model_LU mlu
-			ON mlu.modelId = vt.modelId
-		INNER JOIN Fuel_LU flu
-			ON flu.fuelId = vt.fuelId
-		INNER JOIN Submodel_LU slu
-			ON slu.submodelId = vt.submodelId
-		INNER JOIN Year_LU ylu
-			ON ylu.yearId = vt.yearId
-		     WHERE vt.serialNumber = '$serial'";          
-	$result = mysql_query ($query)  or die(mysql_error());
-	//Return either the result or that there was no result
-	if ($row = mysql_fetch_array($result)) {
-		$row['found'] = true;
+        $data = array();
+	//Call the database
+        $data['command'] = "serialsearch";
+	$data['serialNumber'] = $serial;
+        $output = do_post_request($data);
+	//Decode response
+	$response = json_decode($output, true);
+	//Get data
+	$vehicle = $response['data'];
+
+	if (!empty($vehicle)) {
 		$_SESSION['tempSerialNumber'] = $serial;
-		jsonResponse($row);
+		jsonResponse($vehicle);
 	} else {
 		jsonResponse("There were no results.");
-	}
+	}	
 //Loads the info for vehicleResults.js
 } else if (strcasecmp($command, 'vehicleResultsLoad') == 0){
 	//Get the serial number from the session
 	$serial = $_SESSION['tempSerialNumber'];
-	$query = "    SELECT vt.serialNumber,
-				   mlu.name as model,
-				   flu.name as fuel,
-				   slu.name as submodel,
-				   ylu.name as year
-			      FROM Vehicle_Type vt
-			INNER JOIN Model_LU mlu
-				ON mlu.modelId = vt.modelId
-			INNER JOIN Fuel_LU flu
-				ON flu.fuelId = vt.fuelId
-			INNER JOIN Submodel_LU slu
-				ON slu.submodelId = vt.submodelId
-			INNER JOIN Year_LU ylu
-				ON ylu.yearId = vt.yearId ";
-	if (!empty($serial)){
-		$query = $query . " WHERE vt.serialNumber = '$serial'";
-	}else { 
-		//Use a different query if picked from the select screens
-		$modelId = $_SESSION['tempModel'];
-		$fuelId = $_SESSION['tempFuel'];
-		$submodelId = $_SESSION['tempSubmodel'];
-		$yearId = $_SESSION['tempYear'];
-		$query = $query .
-			     "WHERE vt.modelId = '$modelId'
-			       AND vt.fuelId = '$fuelId'
-			       AND vt.submodelId = '$submodelId'
-			       AND vt.yearId = '$yearId'";
-	} 
-	//Run the query
-	$result = mysql_query ($query)  or die(mysql_error());
-	//Return either the result or that there was no result
-	if ($row = mysql_fetch_array($result)) {
-		$row['found'] = true;
-		$_SESSION['tempVehicle'] = $row;
-		$_SESSION['tempSerialNumber'] = $row['serialNumber'];	
-		jsonResponse($row);
+	$output = "";
+	$data = array();
+	//If the serial number is set, make a different db call than if its not
+	if(!empty($serial)) {
+		$data['command'] = "serialsearch";
+		$data['serialNumber'] = $serial;
+		$output = do_post_request($data);
 	} else {
-		jsonResponse("There was an error in the session.");
+		$data['command'] = "selectVehicleResults";
+		$data['model'] = $_SESSION['tempModel'];
+		$data['fuel'] = $_SESSION['tempFuel'];
+		$data['submodel'] = $_SESSION['tempSubmodel'];
+		$data['year'] = $_SESSION['tempYear'];
+		$output = do_post_request($data);
+	}
+	//Decode response
+	$response = json_decode($output, true);
+	//Get data
+	$vehicle = $response['data'];
+	if (!empty($vehicle)) {
+ 		$_SESSION['tempVehicle'] = $vehicle;
+		$_SESSION['tempSerialNumber'] = $vehicle['serialNumber'];
+		jsonResponse($vehicle);
+	} else {
+		jsonResponse("There was an error in the session $output" );
 	}
 //Cancels the vehicle results by removing the temp serial number
 } else if (strcasecmp($command, 'vehicleResultsCancel') == 0){
@@ -215,16 +190,12 @@ if (strcasecmp($command, 'login') == 0) {
 //Loads the models for the select model page
 }else if (strcasecmp($command, 'selectModelLoad') == 0){
 	//Search the databases
-	$query = "SELECT *
-  		FROM Model_LU";
-	$result = mysql_query ($query)  or die(mysql_error());
-	$models = array();
-	$i = 0;
-	//Return all results or that there was no result
-	while ($row = mysql_fetch_array($result)) {
-		$models[$i] = $row;
-		$i = $i + 1;
-	} 
+	$data = array();
+	$data['command'] = "selectModelLoad";
+	$output = do_post_request($data);
+	$response = json_decode($output, true);
+	//Get data
+	$models = $response['data'];
 	if (!empty($models)) {
 		jsonResponse($models);
 	} else {
@@ -237,26 +208,21 @@ if (strcasecmp($command, 'login') == 0) {
 		$selectedModel = $request['model'];
 	}
 	$_SESSION['tempModel'] = $selectedModel;
-	jsonResponse("This is a test '$selectedModel");
+	jsonResponse(true);
 //Loads the fuels for the select fuel page
 }else if (strcasecmp($command, 'selectFuelLoad') == 0){
 	//Get the model from the session
 	$modelId = $_SESSION['tempModel'];
-	//Search the databases
-	$query = "    SELECT flu.*
-		        FROM Fuel_LU flu
-		  INNER JOIN Vehicle_Type vt
-	       		  ON vt.fuelId = flu.fuelId
-		       WHERE vt.modelId = '$modelId'
-		    GROUP BY flu.fuelId";
-	$result = mysql_query ($query)  or die(mysql_error());
-	$fuels = array();
-	$i = 0;
-	//Return all results or that there was no result
-	while ($row = mysql_fetch_array($result)) {
-		$fuels[$i] = $row;
-		$i = $i + 1;
-	} 
+        $data = array();
+	//Call the database
+        $data['command'] = "selectFuelLoad";
+	$data['model'] = $modelId;
+
+        $output = do_post_request($data);
+
+	$response = json_decode($output, true);
+	//Get data
+	$fuels = $response['data'];
 	if (!empty($fuels)) {
 		jsonResponse($fuels);
 	} else {
@@ -275,22 +241,17 @@ if (strcasecmp($command, 'login') == 0) {
 	//Get the model and fuel from the session
 	$modelId = $_SESSION['tempModel'];
 	$fuelId = $_SESSION['tempFuel'];
-	//Search the databases
-	$query = "          SELECT slu.*
-			      FROM Submodel_LU slu
-			INNER JOIN Vehicle_Type vt
-				ON vt.submodelId = slu.submodelId
-			     WHERE vt.modelId = '$modelId'
-			       AND vt.fuelId = '$fuelId'
-			  GROUP BY slu.submodelId";
-	$result = mysql_query ($query)  or die(mysql_error());
-	$submodels = array();
-	$i = 0;
-	//Return all results or that there was no result
-	while ($row = mysql_fetch_array($result)) {
-		$submodels[$i] = $row;
-		$i = $i + 1;
-	} 
+        $data = array();
+	//Call the database
+        $data['command'] = "selectSubmodelLoad";
+	$data['model'] = $modelId;
+	$data['fuel'] = $fuelId;
+
+        $output = do_post_request($data);
+
+	$response = json_decode($output, true);
+	//Get data
+	$submodels = $response['data'];
 	if (!empty($submodels)) {
 		jsonResponse($submodels);
 	} else {
@@ -310,23 +271,17 @@ if (strcasecmp($command, 'login') == 0) {
 	$modelId = $_SESSION['tempModel'];
 	$fuelId = $_SESSION['tempFuel'];
 	$submodelId = $_SESSION['tempSubmodel'];
-	//Search the databases
-	$query = "  SELECT ylu.*
-		      FROM Year_LU ylu
-		INNER JOIN Vehicle_Type vt
-			ON vt.yearId = ylu.yearId
-		     WHERE vt.modelId = '$modelId'
-		       AND vt.fuelId = '$fuelId'
-		       AND vt.submodelId = '$submodelId'
-		  GROUP BY ylu.yearId";
-	$result = mysql_query ($query)  or die(mysql_error());
-	$years = array();
-	$i = 0;
-	//Return all results or that there was no result
-	while ($row = mysql_fetch_array($result)) {
-		$years[$i] = $row;
-		$i = $i + 1;
-	} 
+	//Call the database
+        $data['command'] = "selectYearLoad";
+	$data['model'] = $modelId;
+	$data['fuel'] = $fuelId;
+	$data['submodel'] = $submodelId;
+
+        $output = do_post_request($data);
+
+	$response = json_decode($output, true);
+	//Get data
+	$years = $response['data'];
 	if (!empty($years)) {
 		jsonResponse($years);
 	} else {
@@ -347,68 +302,45 @@ if (strcasecmp($command, 'login') == 0) {
 //Loads the vehicles for the current user
 } else if (strcasecmp($command, 'accountVehiclesLoad') == 0) {
 	$accountId = $_SESSION['uid'];
-	//Search the databases
-	$query = "          SELECT vt.serialNumber,
-				   mlu.name as model,
-				   flu.name as fuel,
-				   slu.name as submodel,
-				   ylu.name as year
-			      FROM Account_Vehicle av
-			INNER JOIN Vehicle_Type vt
-				ON av.serialNumber = vt.serialNumber
-			INNER JOIN Model_LU mlu
-				ON mlu.modelId = vt.modelId
-			INNER JOIN Fuel_LU flu
-				ON flu.fuelId = vt.fuelId
-			INNER JOIN Submodel_LU slu
-				ON slu.submodelId = vt.submodelId
-			INNER JOIN Year_LU ylu
-				ON ylu.yearId = vt.yearId
-			     WHERE av.accountId = '$accountId'";
-	$result = mysql_query ($query)  or die(mysql_error());
-	$vehicles = array();
-	$i = 0;
-	//Return all results or that there was no result
-	while ($row = mysql_fetch_array($result)) {
-		$vehicles[$i] = $row;
-		$i = $i + 1;
-	} 
+        $data = array();
+	//Call the database
+        $data['command'] = "accountVehiclesLoad";
+	$data['account'] = $accountId;
+
+        $output = do_post_request($data);
+
+	$response = json_decode($output, true);
+	//Get data
+	$vehicles = $response['data'];
 	if (!empty($vehicles)) {
 		jsonResponse($vehicles);
 	} else {
-		jsonResponse("There are no years matching this filter.");
+		jsonResponse("There are no vehicles for this account.");
 	}
 //Saves the selected vehicle to the session as a parts filter
 } else if (strcasecmp($command, 'accountVehicleSessionSave') == 0){
+	$serial = "";	
 	if (isset($request['serialNumber'])){
-		$serialNumber = $request['serialNumber'];
+		$serial = $request['serialNumber'];
 	}
-	$query = "    SELECT vt.serialNumber,
-				   mlu.name as model,
-				   flu.name as fuel,
-				   slu.name as submodel,
-				   ylu.name as year
-			      FROM Vehicle_Type vt
-			INNER JOIN Model_LU mlu
-				ON mlu.modelId = vt.modelId
-			INNER JOIN Fuel_LU flu
-				ON flu.fuelId = vt.fuelId
-			INNER JOIN Submodel_LU slu
-				ON slu.submodelId = vt.submodelId
-			INNER JOIN Year_LU ylu
-				ON ylu.yearId = vt.yearId 
-			     WHERE vt.serialNumber = '$serialNumber'";
-	//Run the query
-	$result = mysql_query ($query)  or die(mysql_error());
-	//Return either the result or that there was no result
-	if ($row = mysql_fetch_array($result)) {
-		$row['found'] = true;
-		$_SESSION['currentSerialNumber'] = $row['serialNumber'];
-		$_SESSION['currentVehicle'] = $row;
-		jsonResponse($row);
+        $data = array();
+	//Call the database
+        $data['command'] = "serialsearch";
+	$data['serialNumber'] = $serial;
+        $output = do_post_request($data);
+	//Decode response
+	$response = json_decode($output, true);
+	//Get data
+	$vehicle = $response['data'];
+
+	if (!empty($vehicle)) {
+		$vehicle['found'] = true;
+		$_SESSION['currentSerialNumber'] = $vehicle['serialNumber'];
+		$_SESSION['currentVehicle'] = $vehicle;
+		jsonResponse($vehicle);
 	} else {
-		jsonResponse("There was an error in the session.");
-	}
+		jsonResponse("There were no results.");
+	}	
 //Searches the parts bases on a given string
 } else if (strcasecmp($command, 'partsSearch') == 0) {
 //Check for a vehicle filter
@@ -416,104 +348,39 @@ if (strcasecmp($command, 'login') == 0) {
 	if (isset($request['part'])){
 		$part = $request['part'];	
 	}
-	//Search the database	
-	$query = "
-		SELECT Results.rank,
-		       p.partNumber,
-		       p.name,
-		       p.price,
-		       p.description,
-		       pslu.name AS subcategoryName,
-		       plu.name AS categoryName,
-		       alu.name AS availability
-		FROM(
-		(
-			SELECT 1 AS rank,
-			       partNumber
-			  FROM Part
-			 WHERE partNumber = '$part'
-		)
-		UNION
-		(
-			SELECT 2 AS rank,
-			       partNumber
-			  FROM Part
-			 WHERE UPPER(name) = UPPER('$part')
-		)
-		UNION
-		(
-			SELECT 3 AS rank,
-			       partNumber
-			  FROM Part
-			 WHERE partNumber LIKE '$part%'
-		)
-		UNION
-		(
-			SELECT 4 AS rank,
-			       partNumber
-			  FROM Part
-			 WHERE UPPER(name) LIKE UPPER('$part%')
-		)
-		UNION
-		(
-			SELECT 5 AS rank,
-			       partNumber
-			  FROM Part
-			 WHERE partNumber LIKE '%$part%'
-		)
-		UNION
-		(
-			SELECT 6 AS rank,
-			       partNumber
-			  FROM Part
-			 WHERE UPPER(name) LIKE UPPER('%$part%')
-		)
-		) AS Results
-		INNER JOIN Part p
-			ON p.partNumber = Results.partNumber
-		INNER JOIN Part_Subcategory_LU pslu
-			ON p.partSubcategoryId = pslu.subcategoryId
-		INNER JOIN Part_Category_LU plu
-			ON pslu.categoryId = plu.categoryId
-		INNER JOIN Availability_LU alu
-			ON p.availabilityId = alu.availabilityId
-		  GROUP BY Results.partNumber
-		    HAVING MIN(rank)
-		  ORDER BY Results.rank ASC, Results.partNumber ASC";          
-	$result = mysql_query ($query)  or die(mysql_error());
-	//Save the search
-	if ($row = mysql_fetch_array($result)) {
+        $data = array();
+	//Call the database
+        $data['command'] = "partsSearch";
+	$data['query'] = $part;
+        $output = do_post_request($data);
+	//Decode response
+	$response = json_decode($output, true);
+	//Get data
+	$vehicles = $response['data'];
+
+	if (!empty($vehicles)) {
 		$_SESSION['partSearchQuery'] = $part;
 		jsonResponse(true);
 	} else {
 		jsonResponse("There were no results.");
-	}
+	}	
 //Loads the parts categories for the parts category page
 } else if (strcasecmp($command, 'partCategoryLoad') == 0) {
 	//Check for a vehicle filter
 	$filter = $_SESSION['currentSerialNumber'];
 	//Get the categories from the database
-	$query = "  SELECT pclu.*
-		      FROM Part_Category_LU pclu";
-	if(!empty($filter)) {
-		$query = $query . 
-		       " INNER JOIN Part_Subcategory_LU pslu
-				ON pclu.categoryId = pslu.categoryId
-			INNER JOIN Part p
-				ON p.partSubcategoryId = pslu.subcategoryId
-			INNER JOIN Vehicle_Type_Part vtp
-				ON vtp.partNumber = p.partNumber
-			     WHERE vtp.serialNumber = '$filter'
-			  GROUP BY pclu.categoryId";
+	$data = array();
+	//Change query based on if there is a filter or not
+	if (!empty($filter)) {	
+		$data['command'] = "partCategoryLoadFilter";
+		$data['filter'] = $filter;
+	} else {
+		$data['command'] = "partCategoryLoadAll";
 	}
-	$result = mysql_query ($query)  or die(mysql_error());
-	$categories = array();
-	$i = 0;
-	//Return all results or that there was no result
-	while ($row = mysql_fetch_array($result)) {
-		$categories[$i] = $row;
-		$i = $i + 1;
-	} 
+	$output = do_post_request($data);
+	$response = json_decode($output, true);
+	//Get data
+	$categories = $response['data'];
 	if (!empty($categories)) {
 		jsonResponse($categories);
 	} else {
@@ -522,110 +389,30 @@ if (strcasecmp($command, 'login') == 0) {
 //Loads the part search results	
 } else if (strcasecmp($command, 'partsSearchLoadResults') == 0) {
 	$part = $_SESSION['partSearchQuery'];
-	//Search the database	
+	//If part is not empty, get search results.  Otherwise get select results	
 	if (!empty($part)) {
-		$query = "
-			SELECT Results.rank,
-			       p.partNumber,
-			       p.name,
-			       p.price,
-			       p.description,
-			       pslu.name AS subcategoryName,
-			       plu.name AS categoryName,
-			       alu.name AS availability
-			FROM(
-			(
-				SELECT 1 AS rank,
-				       partNumber
-				  FROM Part
-				 WHERE partNumber = '$part'
-			)
-			UNION
-			(
-				SELECT 2 AS rank,
-				       partNumber
-				  FROM Part
-				 WHERE UPPER(name) = UPPER('$part')
-			)
-			UNION
-			(
-				SELECT 3 AS rank,
-				       partNumber
-				  FROM Part
-				 WHERE partNumber LIKE '$part%'
-			)
-			UNION
-			(
-				SELECT 4 AS rank,
-				       partNumber
-				  FROM Part
-				 WHERE UPPER(name) LIKE UPPER('$part%')
-			)
-			UNION
-			(
-				SELECT 5 AS rank,
-				       partNumber
-				  FROM Part
-				 WHERE partNumber LIKE '%$part%'
-			)
-			UNION
-			(
-				SELECT 6 AS rank,
-				       partNumber
-				  FROM Part
-				 WHERE UPPER(name) LIKE UPPER('%$part%')
-			)
-			) AS Results
-			INNER JOIN Part p
-				ON p.partNumber = Results.partNumber
-			INNER JOIN Part_Subcategory_LU pslu
-				ON p.partSubcategoryId = pslu.subcategoryId
-			INNER JOIN Part_Category_LU plu
-				ON pslu.categoryId = plu.categoryId
-			INNER JOIN Availability_LU alu
-				ON p.availabilityId = alu.availabilityId
-			  GROUP BY Results.partNumber
-			    HAVING MIN(rank)
-			  ORDER BY Results.rank ASC, Results.partNumber ASC";   
+		$data['command'] = "partsSearch";
+		$data['query'] = $part;
 	} else {
 		$filter = $_SESSION['currentSerialNumber'];
 		$subcategory = $_SESSION['tempSubcategory'];
-		$query = "  SELECT p.partNumber,
-				   p.name,
-				   p.price,
-				   p.description,
-				   pslu.name AS subcategoryName,
-				   plu.name AS categoryName,
-				   alu.name AS availability
-			      FROM Part p";
-		if (!empty($filter)) {
-			$query = $query . " INNER JOIN Vehicle_Type_Part vtp
-				ON p.partNumber = vtp.partNumber";
+		if(!empty($filter)) {
+			$data['command'] = "selectPartResultsFiltered";
+			$data['subcategory'] = $subcategory;	
+			$data['filter'] = $filter;	
+		} else {
+			$data['command'] = "selectPartResultsAll";
+			$data['subcategory'] = $subcategory;	
 		}
-			$query = $query . " INNER JOIN Part_Subcategory_LU pslu
-				ON p.partSubcategoryId = pslu.subcategoryId
-			INNER JOIN Part_Category_LU plu
-				ON pslu.categoryId = plu.categoryId
-			INNER JOIN Availability_LU alu
-				ON p.availabilityId = alu.availabilityId
-			     WHERE p.partSubcategoryId = '$subcategory'";
-
-		if (!empty($filter)) {
-			$query = $query . " AND vtp.serialNumber = '$filter'";
-		}
-	}       
-	$result = mysql_query ($query)  or die(mysql_error());
-	$parts = array();
-	$i = 0;
-	//Save the search
-	while ($row = mysql_fetch_array($result)) {
-		$parts[$i] = $row;
-		$i = $i + 1;
-	} 
+	}
+	$output = do_post_request($data);
+	$response = json_decode($output, true);
+	//Get data
+	$parts = $response['data'];
 	if (!empty($parts)) {
 		jsonResponse($parts);
 	} else {
-		jsonResponse("There are no results. $query");
+		jsonResponse("No results.");
 	}
 //Saves the specific part for later loading
 } else if (strcasecmp($command, 'partsSearchSelectPart') == 0) {
@@ -643,27 +430,18 @@ if (strcasecmp($command, 'login') == 0) {
 } else if (strcasecmp($command, 'partInfoLoad') == 0) {
 	//Get the part number from the session
 	$part = $_SESSION['currentPartNumber'];
-	$query = "          SELECT p.partNumber,
-				   p.name,
-				   p.price,
-				   p.description,
-				   pslu.name AS subcategoryName,
-				   plu.name AS categoryName,
-				   alu.name AS availability
-			      FROM Part p
-			INNER JOIN Part_Subcategory_LU pslu
-				ON p.partSubcategoryId = pslu.subcategoryId
-			INNER JOIN Part_Category_LU plu
-				ON pslu.categoryId = plu.categoryId
-			INNER JOIN Availability_LU alu
-				ON p.availabilityId = alu.availabilityId
-			     WHERE p.partNumber = '$part'"; 
-	//Run the query
-	$result = mysql_query ($query)  or die(mysql_error());
-	//Return either the result or that there was no result
-	if ($row = mysql_fetch_array($result)) {
-		$row['found'] = true;
-		jsonResponse($row);
+        $data = array();
+	//Call the database
+        $data['command'] = "partInfoLoad";
+	$data['part'] = $part;
+        $output = do_post_request($data);
+	//Decode response
+	$response = json_decode($output, true);
+	//Get data
+	$displayPart = $response['data'];
+
+	if (!empty($displayPart)) {
+		jsonResponse($displayPart);
 	} else {
 		jsonResponse("There was an error in the session.");
 	}
@@ -673,6 +451,8 @@ if (strcasecmp($command, 'login') == 0) {
 	if (isset($request['category'])){
 		$selectedCategory = $request['category'];
 	}
+	$_SESSION['partSearchQuery'] = "";
+	$_SESSION['tempSubcategory'] = "";
 	$_SESSION['tempCategory'] = $selectedCategory;
 	jsonResponse(true);
 //Loads the list of subcategories
@@ -680,36 +460,25 @@ if (strcasecmp($command, 'login') == 0) {
 	//Check for a vehicle filter
 	$filter = $_SESSION['currentSerialNumber'];
 	$category = $_SESSION['tempCategory'];
-	//Get the subcategories from the database
-	$query = "SELECT pslu.subcategoryId,
-                         pslu.name
-                    FROM Part_Subcategory_LU pslu";
-	if(!empty($filter)) {
-		$query = $query . 
-		      " INNER JOIN Part_Category_LU pclu
-				ON pslu.categoryId = pclu.categoryId
-			INNER JOIN Part p
-				ON p.partSubcategoryId = pslu.subcategoryId
-			INNER JOIN Vehicle_Type_Part vtp
-				ON vtp.partNumber = p.partNumber";
-	} 
-	$query = $query . " WHERE pslu.categoryId = '$category'";
-	if (!empty($filter)) {
-		$query = $query . " AND vtp.serialNumber = '$filter'
-			  GROUP BY pslu.subcategoryId";
+	//Get the subategories from the database
+	$data = array();
+	//Change query based on if there is a filter or not
+	if (!empty($filter)) {	
+		$data['command'] = "partSubcategoryLoadFilter";
+		$data['category'] = $category;
+		$data['filter'] = $filter;
+	} else {
+		$data['command'] = "partSubcategoryLoadAll";
+		$data['category'] = $category;
 	}
-	$result = mysql_query ($query)  or die(mysql_error());
-	$categories = array();
-	$i = 0;
-	//Return all results or that there was no result
-	while ($row = mysql_fetch_array($result)) {
-		$categories[$i] = $row;
-		$i = $i + 1;
-	} 
+	$output = do_post_request($data);
+	$response = json_decode($output, true);
+	//Get data
+	$categories = $response['data'];
 	if (!empty($categories)) {
 		jsonResponse($categories);
 	} else {
-		jsonResponse("Error loading parts subcategories.");
+		jsonResponse("No parts categories.");
 	}
 //Saves the subcategory that was selected
 } else if (strcasecmp($command, 'selectSubcategorySave') == 0) {
@@ -736,9 +505,11 @@ if (strcasecmp($command, 'login') == 0) {
 	unset($_SESSION['tempYear']);
 	unset($_SESSION['tempVehicle']);	
 	//Save to account
-	$query = " INSERT INTO Account_Vehicle (accountId, serialNumber)
-     			VALUES ($accountId, $serialNumber)";
-	$result = mysql_query ($query)  or die(mysql_error());
+	$data = array();
+	$data['command'] = "vehicleResultsAccountSave";
+	$data['account'] = $accountId;
+	$data['serial'] = $serialNumber;
+	$output = do_post_request($data);
 	jsonResponse(true);
 //Removes vehicle from account
 } else if (strcasecmp($command, 'accountVehicleRemove') == 0) {
@@ -748,44 +519,30 @@ if (strcasecmp($command, 'login') == 0) {
 	if (isset($request['serial'])){
 		$serialNumber = $request['serial'];
 	}
-	$query = "  DELETE FROM Account_Vehicle
-			  WHERE accountId = '$accountId'
-      			    AND serialNumber = '$serialNumber'
-      			  LIMIT 1";
-	$result = mysql_query ($query)  or die(mysql_error());
+	//Remove from account
+	$data = array();
+	$data['command'] = "accountVehicleRemove";
+	$data['account'] = $accountId;
+	$data['serial'] = $serialNumber;
+	$output = do_post_request($data);
 	jsonResponse(true);
 //Load shopping cart
 } else if (strcasecmp($command, 'shoppingCartLoad') == 0) {
 	$accountId = $_SESSION['uid'];
-	$query = "  SELECT p.partNumber,
-			   p.name,
-			   p.price,
-			   p.description,
-			   pslu.name AS subcategoryName,
-			   plu.name AS categoryName,
-			   alu.name AS availability
-		      FROM Shopping_Cart sc
-		INNER JOIN Part p
-			ON sc.partNumber = p.partNumber
-		INNER JOIN Part_Subcategory_LU pslu
-			ON p.partSubcategoryId = pslu.subcategoryId
-		INNER JOIN Part_Category_LU plu
-			ON pslu.categoryId = plu.categoryId
-		INNER JOIN Availability_LU alu
-			ON p.availabilityId = alu.availabilityId
-		     WHERE sc.accountId = '$accountId'";
-	$result = mysql_query ($query)  or die(mysql_error());
-	$items = array();
-	$i = 0;
-	//Return all results or that there was no result
-	while ($row = mysql_fetch_array($result)) {
-		$items[$i] = $row;
-		$i = $i + 1;
-	} 
-	if (!empty($items)) {
-		jsonResponse($items);
+        $data = array();
+	//Call the database
+        $data['command'] = "shoppingCartLoad";
+	$data['account'] = $accountId;
+        $output = do_post_request($data);
+	//Decode response
+	$response = json_decode($output, true);
+	//Get data
+	$displayPart = $response['data'];
+
+	if (!empty($displayPart)) {
+		jsonResponse($displayPart);
 	} else {
-		jsonResponse("Error loading parts subcategories.");
+		jsonResponse("There is nothing in your shopping cart");
 	}
 //Add part to shopping cart
 } else if (strcasecmp($command, 'addToCart') == 0) {
@@ -793,15 +550,18 @@ if (strcasecmp($command, 'login') == 0) {
 	//Make sure the user is logged in.
 	if (empty($accountId)) {
 		jsonResponse("Login to use the shopping cart.");
+	} else {
+		$partNumber = $_SESSION['currentPartNumber'];	
+		//Remove the temporary part number
+		unset($_SESSION['currentPartNumber']);	
+		//Save to account
+		$data = array();
+		$data['command'] = "addToCart";
+		$data['account'] = $accountId;
+		$data['part'] = $partNumber;
+		$output = do_post_request($data);
+		jsonResponse(true);
 	}
-	$partNumber = $_SESSION['currentPartNumber'];	
-	//Remove the temporary serial number
-	unset($_SESSION['currentPartNumber']);	
-	//Save to account
-	$query = " INSERT INTO Shopping_Cart (accountId, partNumber)
-     			VALUES ($accountId, $partNumber)";
-	$result = mysql_query ($query)  or die(mysql_error());
-	jsonResponse(true);
 //Remove part from shopping cart
 } else if (strcasecmp($command, 'shoppingCartRemove') == 0) {
 	$accountId = $_SESSION['uid'];
@@ -809,32 +569,37 @@ if (strcasecmp($command, 'login') == 0) {
 	if (isset($request['part'])){
 		$partNumber = $request['part'];
 	}
-	$query = "  DELETE FROM Shopping_Cart
-			  WHERE accountId = '$accountId'
-      			    AND partNumber = '$partNumber'
-      			  LIMIT 1";
-	$result = mysql_query ($query)  or die(mysql_error());
+	$data = array();
+	$data['command'] = "shoppingCartRemove";
+	$data['account'] = $accountId;
+	$data['part'] = $partNumber;
+	$output = do_post_request($data);
 	jsonResponse(true);
 //Removes everything from shopping cart for checkout
 } else if (strcasecmp($command, 'checkout') == 0) {
 	$accountId = $_SESSION['uid'];
-	$query = "  DELETE FROM Shopping_Cart
-			  WHERE accountId = '$accountId'";
-	$result = mysql_query ($query)  or die(mysql_error());
+	$data = array();
+	$data['command'] = "checkout";
+	$data['account'] = $accountId;
+	$output = do_post_request($data);
 	jsonResponse(true);
 //Loads the account info
 } else if (strcasecmp($command, 'loadAccountInfo') == 0) {
 	$accountId = $_SESSION['uid'];
-	$query = "      SELECT email,
-			       offers
-			  FROM Account
-			 WHERE accountId = '$accountId'";
-	$result = mysql_query ($query)  or die(mysql_error());
-	//Return either the result or that there was no result
-	if ($row = mysql_fetch_array($result)) {
-		jsonResponse($row);
+        $data = array();
+	//Call the database
+        $data['command'] = "loadAccountInfo";
+	$data['account'] = $accountId;
+        $output = do_post_request($data);
+	//Decode response
+	$response = json_decode($output, true);
+	//Get data
+	$displayPart = $response['data'];
+
+	if (!empty($displayPart)) {
+		jsonResponse($displayPart);
 	} else {
-		jsonResponse("Couldn't load account information incorrect.");
+		jsonResponse("Couldn't load account information.");
 	}
 //Updates account info
 } else if (strcasecmp($command, 'updateAccount') == 0) {
@@ -855,26 +620,33 @@ if (strcasecmp($command, 'login') == 0) {
 	if (isset($request['offers'])){
 		$offers = $request['offers'];
 	}
+	$data = array();
 	//Make sure old password is correct
-	$query = "      SELECT *
-			  FROM Account
-			 WHERE accountId = '$accountId'
-			   AND password = '$oldPassword'";
-	$result = mysql_query ($query)  or die(mysql_error());
-	//Make sure there was a result to check password
-	if ($row = mysql_fetch_array($result)) {
-		//Update info
-		$query = "      UPDATE Account
-				   SET email    = '$email',";
-		if (!empty($newPassword)) {			       
-			$query = $query . "password = '$newPassword',";
+            $data['command'] = "authenticate";
+	    $data['username'] = $_SESSION['uname'];
+            $data['password'] = $oldPassword;
+        $output = do_post_request($data);
+	//Decode response
+	$response = json_decode($output, true);
+	//Get data
+	$account = $response['data'];
+	//If login successful, update account information
+	if($account['auth']) {
+		$data = array();
+		$data['email'] = $email;
+		$data['offers'] = $offers;
+		$data['account'] = $accountId;	
+		//Only update password if its there
+		if (!empty($newPassword)) {
+		    $data['command'] = "updateAccountNewPassword";
+		    $data['password'] = $newPassword;
+		} else {
+		    $data['command'] = "updateAccountSamePassword";
 		}
-		$query = $query . " offers   = '$offers'
-				 WHERE accountId = '$accountId'";
-		$result = mysql_query ($query)  or die(mysql_error());
+		$output = do_post_request($data);
 		jsonResponse(true);
 	} else {
-		jsonResponse("Old password did not match account password.");
+		jsonResponse("Current password did not match account password.");
 	}
 }
 

@@ -25,8 +25,10 @@ function getDBResultsArray($dbQuery){
 	
 	$resultsArray = array();
 	if(mysql_num_rows($dbResults) > 0){
-		while($row = mysql_fetch_assoc($dbResults)){
-			$resultsArray[] = $row;
+		$i = 0;
+		while($row = mysql_fetch_array($dbResults)){
+			$resultsArray[$i] = $row;
+			$i = $i + 1;
 		}	
 	}else{
 		$GLOBALS["_PLATFORM"]->sandboxHeader('HTTP/1.1 404 Not Found');

@@ -9,7 +9,7 @@ function serialNumberSearch() {
         success: function(response, textStatus, jqXHR){
             var success = response.success;
 	    if (!success) {
-		alert("PHP failure");
+		alert(response.errors.reason);
 	    } else {
 		//Check if serial number was found or not
 		if (response.data.found) {
