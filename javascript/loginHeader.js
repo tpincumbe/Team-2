@@ -10,13 +10,15 @@ $.ajax({
 		}
 		//If login was successful, display name
 		if (userName != null) {
-			$('.loginLink').replaceWith('<p align="right" class="loginLink"> Welcome ' + userName + ' <a href="myAccount.html">My account</a> <a onClick="logout()" href="login.html">Logout</a></p>');
+			$('.logout').remove();
+			$('.loginLink').replaceWith(' <a href="myAccount.html"  class="loginLink">My account</a> <a onClick="logout()" href="login.html"  class="logout">Logout</a>');
 		} else {
 		//Otherwise, just display login
-			$('.loginLink').replaceWith('<p align="right" class="loginLink"><a href="login.html" id>Login</a></p>');
+			$('.logout').remove();
+			$('.loginLink').replaceWith('<a href="login.html"  class="loginLink">Login</a>');
 		}
-		//$('#headerBar').trigger('create');
-		$(document).trigger('pageinit');
+		$('#headerBar').trigger('create');
+		//$(document).trigger('pageinit');
         },
         error: function(jqXHR, textStatus, errorThrown){
             // log the error to the console
@@ -25,9 +27,10 @@ $.ajax({
                 textStatus, errorThrown
             );
 		//Cancel login
-		$('.loginLink').replaceWith('<p align="right" class="loginLink"><a href="login.html" id>Login</a></p>');
-		//$('#headerBar').trigger('create');
-		$(document).trigger('pageinit');
+		$('.logout').remove();
+		$('.loginLink').replaceWith('<a href="login.html"  class="loginLink">Login</a>');
+		$('#headerBar').trigger('create');
+		//$(document).trigger('pageinit');
         }
     });
 

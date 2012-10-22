@@ -3,6 +3,7 @@ session_start();
 $command = "";
 /* A list of all possible com values in the order they appear below
 	login - Checks user name and password, saves user to session if successful
+	findDealers - Loads the dealers for the map
 	serialsearch - Checks the serial number against known serial numbers and saves
 		a match to session if successful
 	vehicleResultsLoad - Loads the information of the vehicle about to be selected
@@ -102,7 +103,6 @@ if (strcasecmp($command, 'login') == 0) {
     }
     
     echo do_post_request($data);
-}
 //Loads info for the serial number search in myVehicle.js
 }else if (strcasecmp($command, 'serialsearch') == 0){
 	$serial = "";
