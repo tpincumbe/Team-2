@@ -1,0 +1,55 @@
+.ui-header-fixed
+{
+background:white;
+}
+
+.loginLink
+{
+margin-top:2px;
+padding-right:5px;
+}
+.loginLink a
+{
+color:#7A7358;
+text-shadow:none !important;
+}
+
+.ui-btn-up-a
+{
+background-image: -webkit-linear-gradient(#185365,#226882);
+background-image:-moz-linear-gradient(#185365,#226882);
+border:1px solid #548696 !important;
+}
+
+.ui-btn-hover-a
+{
+background-image: -webkit-linear-gradient(#226882,#307085);
+background-image: -moz-linear-gradient(#226882,#307085);
+border:1px solid #548696 !important;
+}
+
+.ui-btn-inner
+{
+border-top:none !important;
+}
+
+.ui-body-c, .ui-overlay-c
+{
+background-image: -webkit-linear-gradient(#463929,#DDD9CF);
+background-image: -moz-linear-gradient(#463929,#DDD9CF);
+
+}
+
+.ui-body-c, .ui-overlay-c
+{
+color:white !important;
+text-shadow: 0 1px 3px #333 !important;
+}
+
+
+
+
+
+
+
+
