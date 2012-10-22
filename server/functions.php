@@ -73,8 +73,6 @@ if (isset($request['com'])){
 
 //Checks the login info from login.js
 if (strcasecmp($command, 'login') == 0) {
-	$uname = "";
-	$pword = "";
         $data = array();
 	//Call the database
 	if (isset($request['username']) && isset($request['password'])){
@@ -94,6 +92,17 @@ if (strcasecmp($command, 'login') == 0) {
 	}
 	//Return the data array to the client as a json object
 	jsonResponse($account);
+//Retrieve list of dealers from databse
+}else if (strcasecmp($command, 'findDealers') == 0){
+    $data = array();
+    if (isset($request['lat']) && isset($request['lng']) && isset($request['zoom'])){
+        $data['lat'] = $request['lat'];
+        $data['lng'] = $request['lng'];
+        $data['zoom'] = $request['zoom'];
+    }
+    
+    echo do_post_request($data);
+}
 //Loads info for the serial number search in myVehicle.js
 }else if (strcasecmp($command, 'serialsearch') == 0){
 	$serial = "";
