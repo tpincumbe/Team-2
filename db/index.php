@@ -177,6 +177,33 @@ function authenticate($uname, $pwd){
     jsonResponse($output);
 }
 
+function findDealers($lat, $lng, $zoom){
+    global $queries;
+    $dbQuery = $queries['findDealers'];
+    $dbQuery = str_replace("/?1", $lat, $dbQuery);
+    $dbQuery = str_replace("/?2" , $lng, $dbQuery);
+    $dbQuery = str_replace("/?3" , $zoom, $dbQuery);
+    
+    $result = getDBResultsArray($dbQuery);
+    $output = array();  
+    if (!$result) {
+    }else {
+        /*$output = array(
+            "id" => $result['id'],
+            "name" => $result['name'],
+            "address" => $result['address'],
+            "city" => $result['city'],
+            "state" => $result['state'],
+            "zip" => $result['zip'],
+            "phone" => $result['phone'],
+            "lat" => $result['lat'],
+            "lng" => $result['lng'],
+            "url" => $result['url']
+            );*/
+    }
+    jsonResponse($result);
+}
+
 /*
  * Searches for a given serial number and returns a vehicle if it exists
  */
