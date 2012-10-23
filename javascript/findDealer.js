@@ -30,21 +30,29 @@ function initialize() {
               };
           });
 
+         getUserLocation();
 }
 
-function getUserLocation() { 
+/**
+ * Retrieves the user location using HTML 5 geolocations.
+ */
+function getUserLocation() {
 //check if the geolocation object is supported, if so get position
-if (navigator.geolocation)
+   if (navigator.geolocation)
 	navigator.geolocation.getCurrentPosition(retrieveDealers, displayError);
-else
-	$('#errors').append("Sorry - your browser doesn't support geolocation!");
+   else
+	alert("Sorry - your browser doesn't support geolocation!");
 }
 
+/**
+ * Makes an ajax call to the databse to retrieve the list of dealers.
+ * It will display markers where the dealers are at on the map.
+ */
 function retrieveDealers(loc){
          userLoc = new google.maps.LatLng(loc.coords.latitude, loc.coords.longitude);
-                  zoom = 10;
-                  map.panTo(userLoc);
-                  map.setZoom(zoom);
+         zoom = 10;
+         map.panTo(userLoc);
+         map.setZoom(zoom);
                   
         $.ajax({
         url: "server/functions.php",
@@ -73,6 +81,10 @@ function retrieveDealers(loc){
     });
 }
 
+/**
+ * This takes a list of dealers and places markers with info bubbles with
+ * information on teh dealers.
+ */
 function displayDealers(dealers){
          var i, marker;
 	 var infowindow = new google.maps.InfoWindow();
@@ -105,6 +117,9 @@ function displayDealers(dealers){
 	 }
 }
 
+/**
+ * Displays an error to the user if retrieving the user's location failed.
+ */
 function displayError(error) { 
 
 //get a reference to the HTML element for writing result
@@ -113,26 +128,18 @@ var locationElement = document.getElementById("locationData");
 //find out which error we have, output message accordingly
 switch(error.code) {
 case error.PERMISSION_DENIED:
-	$('#errors').append("Permission was denied");
+	alert("Permission was denied");
 	break;
 case error.POSITION_UNAVAILABLE:
-	$('#errors').append("Location data not available");
+	alert("Location data not available");
 	break;
 case error.TIMEOUT:
-	$('#errors').append("Location request timeout");
+	alert("Location request timeout");
 	break;
 case error.UNKNOWN_ERROR:
-	$('#errors').append("An unspecified error occurred");
+	alert("An unspecified error occurred");
 	break;
 default:
-	$('#errors').append("Who knows what happened...");
+	alert("Who knows what happened...");
 	break;
 }}
-
-/*
-*	Once the page is fully loaded we will build the map
-*/
-$(document).live("pageinit", function() {
-  initialize();
-  getUserLocation();
-});
