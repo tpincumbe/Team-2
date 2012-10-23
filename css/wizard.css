@@ -46,10 +46,14 @@ color:white !important;
 text-shadow: 0 1px 3px #333 !important;
 }
 
+.infoBubble
+{
+color: black !important;
+text-shadow: none !important;
+}
 
-
-
-
-
-
-
+.dealerLink, .firstHeading
+{
+color: #22586A;
+text-shadow: none !important;
+}

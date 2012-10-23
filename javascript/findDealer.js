@@ -1,4 +1,4 @@
-var map, myOptions, userLoc, zoom;
+var map, myOptions, userLoc, zoom, minZoom = 7, maxZoom = 12;
 
 /*
 *	This function initializes the google map
@@ -6,16 +6,30 @@ var map, myOptions, userLoc, zoom;
 */
 function initialize() {
          if (userLoc == null){
-                  userLoc = new google.maps.LatLng(37.6922, 97.3372);
+                  userLoc = new google.maps.LatLng(37.685921,-97.339725);
                   zoom = 8;
          }
 	 myOptions = {
 	 zoom: zoom,
 	 //center: new google.maps.LatLng(33.777417,-84.397252),		// Center at GA Tech
          center: userLoc,
+         zoomControl: true,
+         zoomControlOptions: {
+                  style: google.maps.ZoomControlStyle.SMALL
+         },
 	 mapTypeId: google.maps.MapTypeId.ROADMAP
 	 }
 	 map = new google.maps.Map(document.getElementById("map_canvas"), myOptions);	// Grabs the map element
+         
+         google.maps.event.addListener(map, 'zoom_changed',
+         function() {
+              if (map.getZoom() < minZoom) {
+                  map.setZoom(minZoom);
+              }else if (map.getZoom() > maxZoom){
+                  map.setZoom(maxZoom);
+              };
+          });
+
 }
 
 function getUserLocation() { 
@@ -27,6 +41,11 @@ else
 }
 
 function retrieveDealers(loc){
+         userLoc = new google.maps.LatLng(loc.coords.latitude, loc.coords.longitude);
+                  zoom = 10;
+                  map.panTo(userLoc);
+                  map.setZoom(zoom);
+                  
         $.ajax({
         url: "server/functions.php",
         type: "post",
@@ -34,18 +53,14 @@ function retrieveDealers(loc){
         data: {'com': 'findDealers', 'lat': loc.coords.latitude, 'lng': loc.coords.longitude, 'zoom': zoom},
         success: function(response, textStatus, jqXHR){
 	    //Get the response
-	    var resp = response;
+	    var resp = jQuery.parseJSON(response);
             var success = resp.success;
 	    //Check for php failer
 	    if (!success) {
             	var error = resp.errors.reason;
             	$('#errors').text("Unable to retrieve Dealer list");
 	    } else {
-                  userLoc = new google.maps.LatLng(loc.coords.latitude, loc.coords.longitude);
-                  zoom = 15;
-                  map.panTo(userLoc);
-                  map.setZoom(zoom);
-                  displayDealers(resp.dealers);
+                  displayDealers(resp.data);
 	    }
         },
         error: function(jqXHR, textStatus, errorThrown){
@@ -61,24 +76,27 @@ function retrieveDealers(loc){
 function displayDealers(dealers){
          var i, marker;
 	 var infowindow = new google.maps.InfoWindow();
-	 
+         
 	 for (i = 0; i < dealers.length; i++){
                   var address_string = dealers[i].address + "<br/>" + dealers[i].city + ", " + dealers[i].state + " " + dealers[i].zip;
+                  var image = "images/ezgo-icon.png";
+                  
                   marker = new google.maps.Marker({
                            position: new google.maps.LatLng(dealers[i].lat,dealers[i].lng),
                            map: map,
-                           title:dealers[i].name
+                           title:dealers[i].name,
+                           icon: image
                   });
 		 google.maps.event.addListener(marker, 'click', (function(marker, i) {
 			 return function(){
 				 infowindow.setContent(
-				 	'<div id="content">'+
+				 	'<div id="content" class="infoBubble">'+
 					'<div id="siteNotice">'+ '</div>'+
 					'<h4 id="firstHeading" class="firstHeading">'+ dealers[i].name + '</h4>'+
-					'<div id="bodyContent">'+
+					'<div id="bodyContent" class="infoBubble">'+
 						'<p>' + address_string + '</p>' +  
 						'<p>' + dealers[i].phone + '</p>' + 
-						'<p>' + dealers[i].url + '</p>' + 
+						'<p><a class="dealerLink" href="http://' + dealers[i].url + '" target="blank">' + dealers[i].url + '</a></p>' + 
 					'</div>'+
 					'</div>');
 				 infowindow.open(map,marker);
@@ -116,5 +134,5 @@ default:
 */
 $(document).live("pageinit", function() {
   initialize();
-  getLocation();
+  getUserLocation();
 });

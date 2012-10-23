@@ -97,12 +97,13 @@ if (strcasecmp($command, 'login') == 0) {
 }else if (strcasecmp($command, 'findDealers') == 0){
     $data = array();
     if (isset($request['lat']) && isset($request['lng']) && isset($request['zoom'])){
+	$data['command'] = 'findDealers';
         $data['lat'] = $request['lat'];
         $data['lng'] = $request['lng'];
         $data['zoom'] = $request['zoom'];
     }
-    
-    echo do_post_request($data);
+    $output = do_post_request($data);
+    print_r($output);
 //Loads info for the serial number search in myVehicle.js
 }else if (strcasecmp($command, 'serialsearch') == 0){
 	$serial = "";

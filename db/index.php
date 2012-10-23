@@ -20,10 +20,14 @@ if (isset($request['command'])){
             $password = $request['password'];
             authenticate($username, $password);
         }
+    }else if (strcasecmp($command, 'findDealers') == 0){
+	
+	if (isset($request['lat']) && isset($request['lng']) && isset($request['zoom'])){
+	    findDealers($request['lat'], $request['lng'], $request['zoom']);
+	}
     } else if(strcasecmp($command, 'serialsearch') == 0){
         if (isset($request['serialNumber'])) {
-            $serialNumber = $request['serialNumber'];
-            serialSearch($serialNumber);
+            serialSearch($request['serialNumber']);
         }
     } else if(strcasecmp($command, 'selectVehicleResults') == 0){
         if (isset($request['model']) && isset($request['fuel']) && isset($request['submodel']) && isset($request['year'])) {
@@ -180,28 +184,33 @@ function authenticate($uname, $pwd){
 function findDealers($lat, $lng, $zoom){
     global $queries;
     $dbQuery = $queries['findDealers'];
-    $dbQuery = str_replace("/?1", $lat, $dbQuery);
+    /*$dbQuery = str_replace("/?1", $lat, $dbQuery);
     $dbQuery = str_replace("/?2" , $lng, $dbQuery);
-    $dbQuery = str_replace("/?3" , $zoom, $dbQuery);
+    $dbQuery = str_replace("/?3" , $zoom, $dbQuery);*/
     
     $result = getDBResultsArray($dbQuery);
     $output = array();  
     if (!$result) {
     }else {
-        /*$output = array(
-            "id" => $result['id'],
-            "name" => $result['name'],
-            "address" => $result['address'],
-            "city" => $result['city'],
-            "state" => $result['state'],
-            "zip" => $result['zip'],
-            "phone" => $result['phone'],
-            "lat" => $result['lat'],
-            "lng" => $result['lng'],
-            "url" => $result['url']
-            );*/
+	$i = 0;
+	foreach($result as $row){
+	    $out = array(
+		"row" => $i,
+		"id" => $row['id'],
+		"name" => $row['name'],
+		"address" => $row['address'],
+		"city" => $row['city'],
+		"state" => $row['state'],
+		"zip" => $row['zip'],
+		"phone" => $row['phone'],
+		"lat" => $row['lat'],
+		"lng" => $row['lng'],
+		"url" => $row['url']
+            );
+	    $output[$i++] = $out;
+	}
     }
-    jsonResponse($result);
+    jsonResponse($output);
 }
 
 /*
