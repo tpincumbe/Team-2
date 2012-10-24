@@ -17,8 +17,8 @@ $.ajax({
 			$('.logout').remove();
 			$('.loginLink').replaceWith('<a href="login.html"  class="loginLink">Login</a>');
 		}
-		$('#headerBar').trigger('create');
-		//$(document).trigger('pageinit');
+		//$('#loginLink').trigger('pageinit');
+		$(document).trigger('pagecreate');
         },
         error: function(jqXHR, textStatus, errorThrown){
             // log the error to the console
@@ -29,8 +29,8 @@ $.ajax({
 		//Cancel login
 		$('.logout').remove();
 		$('.loginLink').replaceWith('<a href="login.html"  class="loginLink">Login</a>');
-		$('#headerBar').trigger('create');
-		//$(document).trigger('pageinit');
+		//$('#headerBar').trigger('create');
+		$(document).trigger('pagecreate');
         }
     });
 
