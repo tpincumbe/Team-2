@@ -18,6 +18,13 @@ text-shadow:none !important;
 {
 background-image: -webkit-linear-gradient(#185365,#226882);
 background-image:-moz-linear-gradient(#185365,#226882);
+background-image:linear-gradient(#185365,#226882);
+border:1px solid #548696 !important;
+}
+.ui-btn-active {
+background-image: -webkit-linear-gradient(#226882,#307085);
+background-image: -moz-linear-gradient(#226882,#307085);
+background-image:linear-gradient(#226882,#307085);
 border:1px solid #548696 !important;
 }
 
@@ -25,6 +32,7 @@ border:1px solid #548696 !important;
 {
 background-image: -webkit-linear-gradient(#226882,#307085);
 background-image: -moz-linear-gradient(#226882,#307085);
+background-image:linear-gradient(#226882,#307085);
 border:1px solid #548696 !important;
 }
 
@@ -37,23 +45,25 @@ border-top:none !important;
 {
 background-image: -webkit-linear-gradient(#463929,#DDD9CF);
 background-image: -moz-linear-gradient(#463929,#DDD9CF);
-
+background-image:linear-gradient(#463929,#DDD9CF);
 }
 
 .ui-body-c, .ui-overlay-c
 {
-color:white !important;
+color:black !important;
 text-shadow: 0 1px 3px #333 !important;
 }
+ui-btn-hidden { 
+position: absolute;
+z-index:1000000; 
+height: 16px; padding: 10px 40px;
+border:2px;
+border-radius: 50px;
+top: 0; left: 0; width: 100%; height: 100%; -webkit-appearance: none; cursor: pointer; 
+background-image:    -moz-linear-gradient( #005881 /*{a-bar-background-start}*/, #003954 /*{a-bar-background-end}*/); /* FF3.6 */
+background-image:    -webkit-linear-gradient( #005881 /*{a-bar-background-start}*/, #003954 /*{a-bar-background-end}*/); /* FF3.6 */
+filter: Alpha(Opacity=0); opacity: .9; font-size: 1px; text-indent: -9999px; }
 
-.infoBubble
-{
-color: black !important;
-text-shadow: none !important;
-}
 
-.dealerLink, .firstHeading
-{
-color: #22586A;
-text-shadow: none !important;
-}
+
+
