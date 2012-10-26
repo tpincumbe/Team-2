@@ -10,15 +10,13 @@ $.ajax({
 		}
 		//If login was successful, display name
 		if (userName != null) {
-			$('.logout').remove();
-			$('.loginLink').replaceWith(' <a href="myAccount.html"  class="loginLink">My account</a> <a onClick="logout()" href="login.html"  class="logout">Logout</a>');
+			$('#myAccountLink').css('display', 'inline-block');
+			$('#loginLink').text("Logout");
 		} else {
 		//Otherwise, just display login
-			$('.logout').remove();
-			$('.loginLink').replaceWith('<a href="login.html"  class="loginLink">Login</a>');
+			$('#loginLink').text("Login");
+			$('#myAccountLink').css('display', 'none');
 		}
-		//$('#loginLink').trigger('pageinit');
-		$(document).trigger('pagecreate');
         },
         error: function(jqXHR, textStatus, errorThrown){
             // log the error to the console
