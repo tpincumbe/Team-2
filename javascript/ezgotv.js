@@ -88,3 +88,19 @@ function printVideos(){
     
     //
 }
+
+function showInstallation(){
+  alert("Installations");
+}
+
+function showFeatured(){
+  alert("Featured");
+}
+
+function showPerformance(){
+  alert("Performance");
+}
+
+function showMaintenance(){
+  alert("Maintenance");
+}
