@@ -85,7 +85,9 @@ if (strcasecmp($command, 'login') == 0) {
 	//Decode response
 	$response = json_decode($output, true);
 	//Get data
-	$account = $response['data'];
+	$account;
+        if ($response['success'])
+            $account = $response['data'];
 	//If login successful, save info to session
 	if($account['auth']) {
 		$_SESSION['uname'] = $account['userName'];	  	
@@ -118,13 +120,16 @@ if (strcasecmp($command, 'login') == 0) {
 	//Decode response
 	$response = json_decode($output, true);
 	//Get data
-	$vehicle = $response['data'];
+	$vehicle;
+        
+        if ($response['success'])
+            $vehicle = $response['data'];
 
 	if (!empty($vehicle)) {
 		$_SESSION['tempSerialNumber'] = $serial;
 		jsonResponse($vehicle);
 	} else {
-		jsonResponse("There were no results.");
+		jsonResponse("No vehicles matched serial: " . $serial . ".");
 	}	
 //Loads the info for vehicleResults.js
 } else if (strcasecmp($command, 'vehicleResultsLoad') == 0){
@@ -148,7 +153,9 @@ if (strcasecmp($command, 'login') == 0) {
 	//Decode response
 	$response = json_decode($output, true);
 	//Get data
-	$vehicle = $response['data'];
+	$vehicle;
+        if ($response['success'])
+            $vehicle = $response['data'];
 	if (!empty($vehicle)) {
  		$_SESSION['tempVehicle'] = $vehicle;
 		$_SESSION['tempSerialNumber'] = $vehicle['serialNumber'];
@@ -205,7 +212,10 @@ if (strcasecmp($command, 'login') == 0) {
 	$output = do_post_request($data);
 	$response = json_decode($output, true);
 	//Get data
-	$models = $response['data'];
+	$models;
+        if ($response['success'])
+            $models = $response['data'];
+            
 	if (!empty($models)) {
 		jsonResponse($models);
 	} else {
@@ -232,7 +242,10 @@ if (strcasecmp($command, 'login') == 0) {
 
 	$response = json_decode($output, true);
 	//Get data
-	$fuels = $response['data'];
+	$fuels;
+        if ($response['success'])
+            $fuels = $response['data'];
+            
 	if (!empty($fuels)) {
 		jsonResponse($fuels);
 	} else {
@@ -261,7 +274,9 @@ if (strcasecmp($command, 'login') == 0) {
 
 	$response = json_decode($output, true);
 	//Get data
-	$submodels = $response['data'];
+	$submodels;
+        if ($response['success'])
+            $submodels = $response['data'];
 	if (!empty($submodels)) {
 		jsonResponse($submodels);
 	} else {
@@ -291,7 +306,9 @@ if (strcasecmp($command, 'login') == 0) {
 
 	$response = json_decode($output, true);
 	//Get data
-	$years = $response['data'];
+	$years;
+        if ($response['success'])
+            $years = $response['data'];
 	if (!empty($years)) {
 		jsonResponse($years);
 	} else {
@@ -321,7 +338,9 @@ if (strcasecmp($command, 'login') == 0) {
 
 	$response = json_decode($output, true);
 	//Get data
-	$vehicles = $response['data'];
+	$vehicles;
+        if ($response['success'])
+            $vehicles = $response['data'];
 	if (!empty($vehicles)) {
 		jsonResponse($vehicles);
 	} else {
@@ -341,7 +360,9 @@ if (strcasecmp($command, 'login') == 0) {
 	//Decode response
 	$response = json_decode($output, true);
 	//Get data
-	$vehicle = $response['data'];
+	$vehicle;
+        if ($response['success'])
+            $vehicle = $response['data'];
 
 	if (!empty($vehicle)) {
 		$vehicle['found'] = true;
@@ -366,7 +387,9 @@ if (strcasecmp($command, 'login') == 0) {
 	//Decode response
 	$response = json_decode($output, true);
 	//Get data
-	$vehicles = $response['data'];
+	$vehicles;
+        if ($response['success'])
+            $vehicles = $response['data'];
 
 	if (!empty($vehicles)) {
 		$_SESSION['partSearchQuery'] = $part;
@@ -390,7 +413,9 @@ if (strcasecmp($command, 'login') == 0) {
 	$output = do_post_request($data);
 	$response = json_decode($output, true);
 	//Get data
-	$categories = $response['data'];
+	$categories;
+        if ($response['success'])
+            $categories = $response['data'];
 	if (!empty($categories)) {
 		jsonResponse($categories);
 	} else {
@@ -418,7 +443,9 @@ if (strcasecmp($command, 'login') == 0) {
 	$output = do_post_request($data);
 	$response = json_decode($output, true);
 	//Get data
-	$parts = $response['data'];
+	$parts;
+        if ($response['success'])
+            $parts = $response['data'];
 	if (!empty($parts)) {
 		jsonResponse($parts);
 	} else {
@@ -448,7 +475,9 @@ if (strcasecmp($command, 'login') == 0) {
 	//Decode response
 	$response = json_decode($output, true);
 	//Get data
-	$displayPart = $response['data'];
+	$displayPart;
+        if ($response['success'])
+            $displayPart = $response['data'];
 
 	if (!empty($displayPart)) {
 		jsonResponse($displayPart);
@@ -484,7 +513,9 @@ if (strcasecmp($command, 'login') == 0) {
 	$output = do_post_request($data);
 	$response = json_decode($output, true);
 	//Get data
-	$categories = $response['data'];
+	$categories;
+        if ($response['success'])
+            $categories = $response['data'];
 	if (!empty($categories)) {
 		jsonResponse($categories);
 	} else {
@@ -547,7 +578,9 @@ if (strcasecmp($command, 'login') == 0) {
 	//Decode response
 	$response = json_decode($output, true);
 	//Get data
-	$displayPart = $response['data'];
+	$displayPart;
+        if ($response['success'])
+            $displayPart = $response['data'];
 
 	if (!empty($displayPart)) {
 		jsonResponse($displayPart);
@@ -604,7 +637,9 @@ if (strcasecmp($command, 'login') == 0) {
 	//Decode response
 	$response = json_decode($output, true);
 	//Get data
-	$displayPart = $response['data'];
+	$displayPart;
+        if ($response['success'])
+            $displayPart = $response['data'];
 
 	if (!empty($displayPart)) {
 		jsonResponse($displayPart);
