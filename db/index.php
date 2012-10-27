@@ -153,10 +153,11 @@ if (isset($request['command'])){
     } else if(strcasecmp($command, 'updateAccountNewPassword') == 0){
 	if(isset($request['email']) && isset($request['password']) && isset($request['offers']) && isset($request['account'])) {
             $email = mysql_real_escape_string($request['email']);
-	    $password = mysql_real_escape_string($request['password']);
+	    $oldPassword = mysql_real_escape_string($request['oldPassword']);
+	    $newPassword = mysql_real_escape_string($request['newPassword']);
 	    $offers = mysql_real_escape_string($request['offers']);
 	    $account = mysql_real_escape_string($request['account']);
-            updateAccountNewPassword($email, $password, $offers, $account);
+            updateAccountNewPassword($email, $oldPassword, $newPassword, $offers, $account);
 	}
     }
 } 
@@ -532,19 +533,20 @@ function updateAccountSamePassword($email, $offers, $account) {
 	$dbQuery = str_replace("/?2", $offers, $dbQuery);
 	$dbQuery = str_replace("/?3", $account, $dbQuery);
 	$result = getDBResultAffected($dbQuery);
-	jsonResponse("$result $dbQuery");
+	jsonResponse($result);
 }
 
 //Updates email, offers and password for account
-function updateAccountNewPassword($email, $password, $offers, $account) {
+function updateAccountNewPassword($email, $oldPassword, $newPassword, $offers, $account) {
 	global $queries;
 	$dbQuery = $queries['updateAccountNewPassword'];
 	$dbQuery = str_replace("/?1", $email, $dbQuery);
-	$dbQuery = str_replace("/?2", $password, $dbQuery);
+	$dbQuery = str_replace("/?2", $newPassword, $dbQuery);
 	$dbQuery = str_replace("/?3", $offers, $dbQuery);
 	$dbQuery = str_replace("/?4", $account, $dbQuery);
+	$dbQuery = str_replace("/?5", $oldPassword, $dbQuery);
 	$result = getDBResultAffected($dbQuery);
-	jsonResponse("$result $dbQuery");
+	jsonResponse($result);
 }
 
 

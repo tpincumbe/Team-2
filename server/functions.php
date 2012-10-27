@@ -615,22 +615,43 @@ if (strcasecmp($command, 'login') == 0) {
 } else if (strcasecmp($command, 'updateAccount') == 0) {
 	$accountId = $_SESSION['uid'];
 	$oldPassword = "";
+	
 	if (isset($request['oldPassword'])){
 		$oldPassword = $request['oldPassword'];
 	}
+	
 	$newPassword = "";
 	if (isset($request['newPassword'])){
 		$newPassword = $request['newPassword'];
 	}
+	
 	$email = "";
 	if (isset($request['email'])){
 		$email = $request['email'];
 	}
+	
 	$offers = "";
 	if (isset($request['offers'])){
 		$offers = $request['offers'];
 	}
+	
 	$data = array();
+	$data['email'] = $email;
+	$data['offers'] = $offers;
+	$data['account'] = $accountId;
+	
+	$com = "updateAccountSamePassword";
+	
+	if (!empty($oldPassword)){
+	    $com = "updateAccountNewPassword";
+	    $data['oldPassword'] = $oldPassword;
+	    $data['newPassword'] = $newPassword;
+	}
+	$data['command'] = $com;
+	
+	$output = do_post_request($data);
+	print_r($output);
+	/*
 	//Make sure old password is correct
             $data['command'] = "authenticate";
 	    $data['username'] = $_SESSION['uname'];
@@ -658,6 +679,7 @@ if (strcasecmp($command, 'login') == 0) {
 	} else {
 		jsonResponse("Current password did not match account password.");
 	}
+	*/
 }
 
 function jsonResponse($param, $print = true, $header = true) {
