@@ -149,7 +149,7 @@
 .ui-btn-down-a {
 	border: 1px solid 		#000 /*{a-bdown-border}*/;
 	background: 			#222 /*{a-bdown-background-color}*/;
-	font-weight: bold;
+	/*font-weight: bold;*/
 	color: 					#fff /*{a-bdown-color}*/;
 	text-shadow: 0 /*{a-bdown-shadow-x}*/ 1px /*{a-bdown-shadow-y}*/ 1px /*{a-bdown-shadow-radius}*/ #111 /*{a-bdown-shadow-color}*/;
 	background-image: -webkit-gradient(linear, left top, left bottom, from( #202020 /*{a-bdown-background-start}*/), to( #2c2c2c /*{a-bdown-background-end}*/)); /* Saf4+, Chrome */
