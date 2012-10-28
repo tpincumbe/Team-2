@@ -36,6 +36,7 @@ $command = "";
 	shoppingCartRemove - Removes item from shopping cart
 	loadAccountInfo - Loads the account info for the update account page
 	updateAccount - Updates the account info
+	register - Registers a new user account
  */
 
 /* A list of all the session variables
@@ -77,7 +78,7 @@ if (strcasecmp($command, 'login') == 0) {
         $data = array();
 	//Call the database
 	if (isset($request['username']) && isset($request['password'])){
-            $data['command'] = "authenticate";
+            $data['com'] = "authenticate";
 	    $data['username'] = $request['username'];
             $data['password'] = $request['password'];
 	}
@@ -99,7 +100,7 @@ if (strcasecmp($command, 'login') == 0) {
 }else if (strcasecmp($command, 'findDealers') == 0){
     $data = array();
     if (isset($request['lat']) && isset($request['lng']) && isset($request['zoom'])){
-	$data['command'] = 'findDealers';
+	$data['com'] = 'findDealers';
         $data['lat'] = $request['lat'];
         $data['lng'] = $request['lng'];
         $data['zoom'] = $request['zoom'];
@@ -114,7 +115,7 @@ if (strcasecmp($command, 'login') == 0) {
 	}
         $data = array();
 	//Call the database
-        $data['command'] = "serialsearch";
+        $data['com'] = "serialsearch";
 	$data['serialNumber'] = $serial;
         $output = do_post_request($data);
 	//Decode response
@@ -139,11 +140,11 @@ if (strcasecmp($command, 'login') == 0) {
 	$data = array();
 	//If the serial number is set, make a different db call than if its not
 	if(!empty($serial)) {
-		$data['command'] = "serialsearch";
+		$data['com'] = "serialsearch";
 		$data['serialNumber'] = $serial;
 		$output = do_post_request($data);
 	} else {
-		$data['command'] = "selectVehicleResults";
+		$data['com'] = "selectVehicleResults";
 		$data['model'] = $_SESSION['tempModel'];
 		$data['fuel'] = $_SESSION['tempFuel'];
 		$data['submodel'] = $_SESSION['tempSubmodel'];
@@ -208,7 +209,7 @@ if (strcasecmp($command, 'login') == 0) {
 }else if (strcasecmp($command, 'selectModelLoad') == 0){
 	//Search the databases
 	$data = array();
-	$data['command'] = "selectModelLoad";
+	$data['com'] = "selectModelLoad";
 	$output = do_post_request($data);
 	$response = json_decode($output, true);
 	//Get data
@@ -235,7 +236,7 @@ if (strcasecmp($command, 'login') == 0) {
 	$modelId = $_SESSION['tempModel'];
         $data = array();
 	//Call the database
-        $data['command'] = "selectFuelLoad";
+        $data['com'] = "selectFuelLoad";
 	$data['model'] = $modelId;
 
         $output = do_post_request($data);
@@ -266,7 +267,7 @@ if (strcasecmp($command, 'login') == 0) {
 	$fuelId = $_SESSION['tempFuel'];
         $data = array();
 	//Call the database
-        $data['command'] = "selectSubmodelLoad";
+        $data['com'] = "selectSubmodelLoad";
 	$data['model'] = $modelId;
 	$data['fuel'] = $fuelId;
 
@@ -297,7 +298,7 @@ if (strcasecmp($command, 'login') == 0) {
 	$fuelId = $_SESSION['tempFuel'];
 	$submodelId = $_SESSION['tempSubmodel'];
 	//Call the database
-        $data['command'] = "selectYearLoad";
+        $data['com'] = "selectYearLoad";
 	$data['model'] = $modelId;
 	$data['fuel'] = $fuelId;
 	$data['submodel'] = $submodelId;
@@ -331,7 +332,7 @@ if (strcasecmp($command, 'login') == 0) {
 	$accountId = $_SESSION['uid'];
         $data = array();
 	//Call the database
-        $data['command'] = "accountVehiclesLoad";
+        $data['com'] = "accountVehiclesLoad";
 	$data['account'] = $accountId;
 
         $output = do_post_request($data);
@@ -354,7 +355,7 @@ if (strcasecmp($command, 'login') == 0) {
 	}
         $data = array();
 	//Call the database
-        $data['command'] = "serialsearch";
+        $data['com'] = "serialsearch";
 	$data['serialNumber'] = $serial;
         $output = do_post_request($data);
 	//Decode response
@@ -381,7 +382,7 @@ if (strcasecmp($command, 'login') == 0) {
 	}
         $data = array();
 	//Call the database
-        $data['command'] = "partsSearch";
+        $data['com'] = "partsSearch";
 	$data['query'] = $part;
         $output = do_post_request($data);
 	//Decode response
@@ -405,10 +406,10 @@ if (strcasecmp($command, 'login') == 0) {
 	$data = array();
 	//Change query based on if there is a filter or not
 	if (!empty($filter)) {	
-		$data['command'] = "partCategoryLoadFilter";
+		$data['com'] = "partCategoryLoadFilter";
 		$data['filter'] = $filter;
 	} else {
-		$data['command'] = "partCategoryLoadAll";
+		$data['com'] = "partCategoryLoadAll";
 	}
 	$output = do_post_request($data);
 	$response = json_decode($output, true);
@@ -426,17 +427,17 @@ if (strcasecmp($command, 'login') == 0) {
 	$part = $_SESSION['partSearchQuery'];
 	//If part is not empty, get search results.  Otherwise get select results	
 	if (!empty($part)) {
-		$data['command'] = "partsSearch";
+		$data['com'] = "partsSearch";
 		$data['query'] = $part;
 	} else {
 		$filter = $_SESSION['currentSerialNumber'];
 		$subcategory = $_SESSION['tempSubcategory'];
 		if(!empty($filter)) {
-			$data['command'] = "selectPartResultsFiltered";
+			$data['com'] = "selectPartResultsFiltered";
 			$data['subcategory'] = $subcategory;	
 			$data['filter'] = $filter;	
 		} else {
-			$data['command'] = "selectPartResultsAll";
+			$data['com'] = "selectPartResultsAll";
 			$data['subcategory'] = $subcategory;	
 		}
 	}
@@ -469,7 +470,7 @@ if (strcasecmp($command, 'login') == 0) {
 	$part = $_SESSION['currentPartNumber'];
         $data = array();
 	//Call the database
-        $data['command'] = "partInfoLoad";
+        $data['com'] = "partInfoLoad";
 	$data['part'] = $part;
         $output = do_post_request($data);
 	//Decode response
@@ -503,11 +504,11 @@ if (strcasecmp($command, 'login') == 0) {
 	$data = array();
 	//Change query based on if there is a filter or not
 	if (!empty($filter)) {	
-		$data['command'] = "partSubcategoryLoadFilter";
+		$data['com'] = "partSubcategoryLoadFilter";
 		$data['category'] = $category;
 		$data['filter'] = $filter;
 	} else {
-		$data['command'] = "partSubcategoryLoadAll";
+		$data['com'] = "partSubcategoryLoadAll";
 		$data['category'] = $category;
 	}
 	$output = do_post_request($data);
@@ -547,7 +548,7 @@ if (strcasecmp($command, 'login') == 0) {
 	unset($_SESSION['tempVehicle']);	
 	//Save to account
 	$data = array();
-	$data['command'] = "vehicleResultsAccountSave";
+	$data['com'] = "vehicleResultsAccountSave";
 	$data['account'] = $accountId;
 	$data['serial'] = $serialNumber;
 	$output = do_post_request($data);
@@ -562,7 +563,7 @@ if (strcasecmp($command, 'login') == 0) {
 	}
 	//Remove from account
 	$data = array();
-	$data['command'] = "accountVehicleRemove";
+	$data['com'] = "accountVehicleRemove";
 	$data['account'] = $accountId;
 	$data['serial'] = $serialNumber;
 	$output = do_post_request($data);
@@ -572,7 +573,7 @@ if (strcasecmp($command, 'login') == 0) {
 	$accountId = $_SESSION['uid'];
         $data = array();
 	//Call the database
-        $data['command'] = "shoppingCartLoad";
+        $data['com'] = "shoppingCartLoad";
 	$data['account'] = $accountId;
         $output = do_post_request($data);
 	//Decode response
@@ -599,7 +600,7 @@ if (strcasecmp($command, 'login') == 0) {
 		unset($_SESSION['currentPartNumber']);	
 		//Save to account
 		$data = array();
-		$data['command'] = "addToCart";
+		$data['com'] = "addToCart";
 		$data['account'] = $accountId;
 		$data['part'] = $partNumber;
 		$output = do_post_request($data);
@@ -613,7 +614,7 @@ if (strcasecmp($command, 'login') == 0) {
 		$partNumber = $request['part'];
 	}
 	$data = array();
-	$data['command'] = "shoppingCartRemove";
+	$data['com'] = "shoppingCartRemove";
 	$data['account'] = $accountId;
 	$data['part'] = $partNumber;
 	$output = do_post_request($data);
@@ -622,7 +623,7 @@ if (strcasecmp($command, 'login') == 0) {
 } else if (strcasecmp($command, 'checkout') == 0) {
 	$accountId = $_SESSION['uid'];
 	$data = array();
-	$data['command'] = "checkout";
+	$data['com'] = "checkout";
 	$data['account'] = $accountId;
 	$output = do_post_request($data);
 	jsonResponse(true);
@@ -631,7 +632,7 @@ if (strcasecmp($command, 'login') == 0) {
 	$accountId = $_SESSION['uid'];
         $data = array();
 	//Call the database
-        $data['command'] = "loadAccountInfo";
+        $data['com'] = "loadAccountInfo";
 	$data['account'] = $accountId;
         $output = do_post_request($data);
 	//Decode response
@@ -682,13 +683,13 @@ if (strcasecmp($command, 'login') == 0) {
 	    $data['oldPassword'] = $oldPassword;
 	    $data['newPassword'] = $newPassword;
 	}
-	$data['command'] = $com;
+	$data['com'] = $com;
 	
 	$output = do_post_request($data);
 	print_r($output);
 	/*
 	//Make sure old password is correct
-            $data['command'] = "authenticate";
+            $data['com'] = "authenticate";
 	    $data['username'] = $_SESSION['uname'];
             $data['password'] = $oldPassword;
         $output = do_post_request($data);
@@ -704,10 +705,10 @@ if (strcasecmp($command, 'login') == 0) {
 		$data['account'] = $accountId;	
 		//Only update password if its there
 		if (!empty($newPassword)) {
-		    $data['command'] = "updateAccountNewPassword";
+		    $data['com'] = "updateAccountNewPassword";
 		    $data['password'] = $newPassword;
 		} else {
-		    $data['command'] = "updateAccountSamePassword";
+		    $data['com'] = "updateAccountSamePassword";
 		}
 		$output = do_post_request($data);
 		jsonResponse(true);
@@ -715,6 +716,33 @@ if (strcasecmp($command, 'login') == 0) {
 		jsonResponse("Current password did not match account password.");
 	}
 	*/
+        
+//Registers a new user account
+} else if (strcasecmp($command, 'register') == 0) {
+    $data = array();
+    if(isset($request['username'])){$data['username']=$request['username'];}
+    if(isset($request['password'])){$data['password']=$request['password'];}
+    if(isset($request['email'])){$data['email']=$request['email'];}
+    if(isset($request['address'])){$data['address']=$request['address'];}
+    if(isset($request['city'])){$data['city']=$request['city'];}
+    if(isset($request['state'])){$data['state']=$request['state'];}
+    if(isset($request['zip'])){$data['zip']=$request['zip'];}
+    if(isset($request['offers'])){$data['offers']=$request['offers'];}
+    $data['com'] = 'register';
+    
+    $output = do_post_request($data);
+    
+    //Decode response
+    $response = json_decode($output, true);
+    //Get data
+    $account;
+    if ($response['success']){
+        $output = $response['data'];
+        $_SESSION['uname'] = $output['userName'];	  	
+        $_SESSION['uid'] = $output['accountID'];
+    }
+    //Return the data array to the client as a json object
+    jsonResponse($output);
 }
 
 function jsonResponse($param, $print = true, $header = true) {
@@ -765,12 +793,11 @@ function do_post_request($params, $optional_headers = null){
         "Content-Length: ".strlen($query)."\r\n",
         'content'=> $query
     );
-
+    
     // Create context resource for our request
     $context = stream_context_create (array ( 'http' => $contextData ));
     // Read page rendered as result of your POST request
     $result =  file_get_contents ($url, false, $context);
-    
     return $result;
 }
 ?>

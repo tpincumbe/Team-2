@@ -19,8 +19,7 @@ function getDBResultsArray($dbQuery){
 	$dbResults=mysql_query($dbQuery);
 
 	if(!$dbResults){
-		$GLOBALS["_PLATFORM"]->sandboxHeader("HTTP/1.1 500 Internal Server Error");
-		die();
+	    return(mysql_error());
 	}
 	
 	$resultsArray = array();
@@ -31,8 +30,7 @@ function getDBResultsArray($dbQuery){
 			$i = $i + 1;
 		}	
 	}else{
-		$GLOBALS["_PLATFORM"]->sandboxHeader('HTTP/1.1 404 Not Found');
-		die();
+	    return(mysql_error());
 	}
 	
 	return $resultsArray;
@@ -42,8 +40,7 @@ function getDBResultRecord($dbQuery){
 	$dbResults=mysql_query($dbQuery);
 
 	if(!$dbResults){
-		$GLOBALS["_PLATFORM"]->sandboxHeader("HTTP/1.1 500 Internal Server Error");
-		die();
+	    return(mysql_error());
 	}
 	
 	return mysql_fetch_assoc($dbResults);
@@ -52,20 +49,18 @@ function getDBResultRecord($dbQuery){
 function getDBResultAffected($dbQuery){
 	$dbResults=mysql_query($dbQuery);
 	if($dbResults){
-		return array('updated'=>$dbResults);
+	    return array('updated'=>$dbResults);
 	}else{
-		$GLOBALS["_PLATFORM"]->sandboxHeader('HTTP/1.1 500 Internal Server Error');
-		die(mysql_error());
+	    return(mysql_error());
 	}
 }
 
 function getDBResultInserted($dbQuery,$id){
 	$dbResults=mysql_query($dbQuery);
 	if($dbResults){
-		return array($id=>mysql_insert_id());
+	    return array($id=>mysql_insert_id());
 	}else{
-		$GLOBALS["_PLATFORM"]->sandboxHeader('HTTP/1.1 500 Internal Server Error');
-		die(mysql_error());
+	    return(mysql_error());
 	}
 }
 ?>

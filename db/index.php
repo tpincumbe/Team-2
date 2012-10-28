@@ -12,8 +12,8 @@ switch($_SERVER['REQUEST_METHOD']){
 }
 
 //runs the correct function based on a command
-if (isset($request['command'])){
-    $command = $request['command'];
+if (isset($request['com'])){
+    $command = $request['com'];
     if(strcasecmp($command, 'authenticate') == 0){
         if (isset($request['username']) && isset($request['password'])){
             $username =  mysql_real_escape_string($request['username']);
@@ -159,6 +159,17 @@ if (isset($request['command'])){
 	    $account = mysql_real_escape_string($request['account']);
             updateAccountNewPassword($email, $oldPassword, $newPassword, $offers, $account);
 	}
+    } else if(strcasecmp($command, 'register') == 0){
+        $uname; $pwd; $email; $address; $city; $state; $zip; $offers;
+        if(isset($request['username'])){$uname=$request['username'];}
+        if(isset($request['password'])){$pwd=$request['password'];}
+        if(isset($request['email'])){$email=$request['email'];}
+        if(isset($request['address'])){$address=$request['address'];}
+        if(isset($request['city'])){$city=$request['city'];}
+        if(isset($request['state'])){$state=$request['state'];}
+        if(isset($request['zip'])){$zip=$request['zip'];}
+        if(isset($request['offers'])){$offers=$request['offers'];}
+        registerNewAccount($uname, $pwd, $email, $address, $city, $state, $zip, $offers);
     }
 } 
 
@@ -549,7 +560,33 @@ function updateAccountNewPassword($email, $oldPassword, $newPassword, $offers, $
 	jsonResponse($result);
 }
 
-
+//Registers a new user account
+function registerNewAccount($uname, $pwd, $email, $address, $city, $state, $zip, $offers){
+    global $queries;
+    $dbQuery = $queries['register'];
+    $dbQuery = str_replace("/?1", $uname, $dbQuery);
+    $dbQuery = str_replace("/?2", $pwd, $dbQuery);
+    $dbQuery = str_replace("/?3", $email, $dbQuery);
+    $dbQuery = str_replace("/?4", $offers, $dbQuery);
+    $dbQuery = str_replace("/?5", $address, $dbQuery);
+    $dbQuery = str_replace("/?6", $city, $dbQuery);
+    $dbQuery = str_replace("/?7", $state, $dbQuery);
+    $dbQuery = str_replace("/?8", $zip, $dbQuery);
+    $result = getDBResultInserted($dbQuery, "Inserted");
+    
+    if(strcasecmp($result['Inserted'], 'D') != 0){
+        $dbQuery = $queries['authenticate'];
+        $dbQuery = str_replace("/?1", $uname, $dbQuery);
+        $dbQuery = str_replace("/?2" , $pwd, $dbQuery);
+        
+        $result = getDBResultRecord($dbQuery);
+        $result = array(
+                    "accountID" => $result['accountID'],
+                    "userName" => $result['userName']
+                    );
+    }
+    jsonResponse($result);
+}
 
 /**
  * Encodes a response to json for the requester 
