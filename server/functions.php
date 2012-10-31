@@ -636,18 +636,7 @@ if (strcasecmp($command, 'login') == 0) {
         $data['com'] = "loadAccountInfo";
 	$data['account'] = $accountId;
         $output = do_post_request($data);
-	//Decode response
-	$response = json_decode($output, true);
-	//Get data
-	$displayPart;
-        if ($response['success'])
-            $displayPart = $response['data'];
-
-	if (!empty($displayPart)) {
-		jsonResponse($displayPart);
-	} else {
-		jsonResponse("Couldn't load account information.");
-	}
+        print_r($output);
 //Updates account info
 } else if (strcasecmp($command, 'updateAccount') == 0) {
 	$accountId = $_SESSION['uid'];
@@ -662,6 +651,26 @@ if (strcasecmp($command, 'login') == 0) {
 		$newPassword = $request['newPassword'];
 	}
 	
+        $address = "";
+        if (isset($request['address'])){
+            $address = $request['address'];
+        }
+        
+        $city = "";
+        if (isset($request['city'])){
+		$city = $request['city'];
+	}
+        
+        $state = "";
+        if (isset($request['state'])){
+		$state = $request['state'];
+	}
+        
+        $zip = "";
+        if (isset($request['zip'])){
+		$zip = $request['zip'];
+	}
+        
 	$email = "";
 	if (isset($request['email'])){
 		$email = $request['email'];
@@ -673,6 +682,10 @@ if (strcasecmp($command, 'login') == 0) {
 	}
 	
 	$data = array();
+        $data['address'] = $address;
+        $data['city'] = $city;
+        $data['state'] = $state;
+        $data['zip'] = $zip;
 	$data['email'] = $email;
 	$data['offers'] = $offers;
 	$data['account'] = $accountId;
@@ -688,35 +701,6 @@ if (strcasecmp($command, 'login') == 0) {
 	
 	$output = do_post_request($data);
 	print_r($output);
-	/*
-	//Make sure old password is correct
-            $data['com'] = "authenticate";
-	    $data['username'] = $_SESSION['uname'];
-            $data['password'] = $oldPassword;
-        $output = do_post_request($data);
-	//Decode response
-	$response = json_decode($output, true);
-	//Get data
-	$account = $response['data'];
-	//If login successful, update account information
-	if($account['auth']) {
-		$data = array();
-		$data['email'] = $email;
-		$data['offers'] = $offers;
-		$data['account'] = $accountId;	
-		//Only update password if its there
-		if (!empty($newPassword)) {
-		    $data['com'] = "updateAccountNewPassword";
-		    $data['password'] = $newPassword;
-		} else {
-		    $data['com'] = "updateAccountSamePassword";
-		}
-		$output = do_post_request($data);
-		jsonResponse(true);
-	} else {
-		jsonResponse("Current password did not match account password.");
-	}
-	*/
         
 //Registers a new user account
 } else if (strcasecmp($command, 'register') == 0) {

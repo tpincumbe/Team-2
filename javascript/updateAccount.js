@@ -1,18 +1,22 @@
-var oldEmail = '';
 $.ajax({
         url: "server/functions.php",
         type: "post",
         context: document.body,
         data: {'com': 'loadAccountInfo'},
         success: function(response, textStatus, jqXHR){
-		if (!response.success) {
+		var resp = jQuery.parseJSON(response);
+		if (!resp.success) {
 			//There was some kind of php error
-			alert("Error:" + response.errors.reason);
+			alert("Error:" + resp.errors.reason);
 		} else {
 			//Put the email and the offers into their field
-				$('#emailField').val(response.data.email);
-				oldEmail = response.data.email;
-			if (response.data.offers == 'Y') {
+			$('#emailField').val(resp.data.email);
+			$('#addressField').val(resp.data.address);
+			$('#cityField').val(resp.data.city);
+			$('#stateField').val(resp.data.state);
+			$('#stateField').selectmenu('refresh');
+			$('#zipField').val(resp.data.zip);
+			if (resp.data.offers == 'Y') {
 				$('#offersField').prop('checked', true);
 			} else {
 				$('#offersField').prop('checked', false);
@@ -34,6 +38,10 @@ function updateAccount() {
    var newPassword = $('#newPasswordField').val();
    var confirmPassword = $('#confirmPasswordField').val();
    var email = $('#emailField').val();
+   var address = $('#addressField').val();
+   var city = $('#cityField').val();
+   var state = $('#stateField').val();
+   var zip = $('#zipField').val();
    var offers = 'N';
    if ($('#offersField').is(':checked')) {
 	offers = 'Y'
@@ -46,8 +54,8 @@ function updateAccount() {
 	     url: "server/functions.php",
 	     type: "post",
 	     context: document.body,
-	     data: {'com': 'updateAccount', 'oldPassword': oldPassword, 'newPassword': newPassword,
-		      'email': email, 'offers': offers},
+	     data: {'com': 'updateAccount', 'oldPassword': oldPassword, 'newPassword': newPassword, 'email': email,
+		      'offers': offers, 'address': address, 'city': city, 'state': state, 'zip': zip},
 	     success: function(response, textStatus, jqXHR){
 		var resp = jQuery.parseJSON(response);
 		var success = resp.success;

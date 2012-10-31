@@ -144,20 +144,30 @@ if (isset($request['com'])){
 	    loadAccountInfo($account);
 	}
     } else if(strcasecmp($command, 'updateAccountSamePassword') == 0){
-	if(isset($request['email']) && isset($request['offers']) && isset($request['account'])) {
+	if(isset($request['email']) && isset($request['offers']) && isset($request['account'])
+           && isset($request['city']) && isset($request['state']) && isset($request['zip'])) {
+            $address = mysql_real_escape_string($request['address']);
+            $city = mysql_real_escape_string($request['city']);
+            $state = mysql_real_escape_string($request['state']);
+            $zip = mysql_real_escape_string($request['zip']);
             $email = mysql_real_escape_string($request['email']);
 	    $offers = mysql_real_escape_string($request['offers']);
 	    $account = mysql_real_escape_string($request['account']);
-            updateAccountSamePassword($email, $offers, $account);
+            updateAccountSamePassword($address, $city, $state, $zip, $email, $offers, $account);
 	}
     } else if(strcasecmp($command, 'updateAccountNewPassword') == 0){
-	if(isset($request['email']) && isset($request['password']) && isset($request['offers']) && isset($request['account'])) {
+	if(isset($request['email']) && isset($request['oldPassword']) && isset($request['newPassword']) && isset($request['offers'])
+           && isset($request['account']) && isset($request['city']) && isset($request['state']) && isset($request['zip'])) {
+            $address = mysql_real_escape_string($request['address']);
+            $city = mysql_real_escape_string($request['city']);
+            $state = mysql_real_escape_string($request['state']);
+            $zip = mysql_real_escape_string($request['zip']);
             $email = mysql_real_escape_string($request['email']);
 	    $oldPassword = mysql_real_escape_string($request['oldPassword']);
 	    $newPassword = mysql_real_escape_string($request['newPassword']);
 	    $offers = mysql_real_escape_string($request['offers']);
 	    $account = mysql_real_escape_string($request['account']);
-            updateAccountNewPassword($email, $oldPassword, $newPassword, $offers, $account);
+            updateAccountNewPassword($address, $city, $state, $zip, $email, $oldPassword, $newPassword, $offers, $account);
 	}
     } else if(strcasecmp($command, 'register') == 0){
         $uname; $pwd; $email; $address; $city; $state; $zip; $offers;
@@ -539,25 +549,33 @@ function loadAccountInfo($account) {
 }
 
 //Updates email and offers for account
-function updateAccountSamePassword($email, $offers, $account) {
+function updateAccountSamePassword($address, $city, $state, $zip, $email, $offers, $account) {
 	global $queries;
 	$dbQuery = $queries['updateAccountSamePassword'];
-	$dbQuery = str_replace("/?1", $email, $dbQuery);
-	$dbQuery = str_replace("/?2", $offers, $dbQuery);
-	$dbQuery = str_replace("/?3", $account, $dbQuery);
+        $dbQuery = str_replace("/?1", $address, $dbQuery);
+        $dbQuery = str_replace("/?2", $city, $dbQuery);
+        $dbQuery = str_replace("/?3", $state, $dbQuery);
+        $dbQuery = str_replace("/?4", $zip, $dbQuery);
+	$dbQuery = str_replace("/?5", $email, $dbQuery);
+	$dbQuery = str_replace("/?6", $offers, $dbQuery);
+	$dbQuery = str_replace("/?7", $account, $dbQuery);
 	$result = getDBResultAffected($dbQuery);
 	jsonResponse($result);
 }
 
 //Updates email, offers and password for account
-function updateAccountNewPassword($email, $oldPassword, $newPassword, $offers, $account) {
+function updateAccountNewPassword($address, $city, $state, $zip, $email, $oldPassword, $newPassword, $offers, $account) {
 	global $queries;
 	$dbQuery = $queries['updateAccountNewPassword'];
-	$dbQuery = str_replace("/?1", $email, $dbQuery);
-	$dbQuery = str_replace("/?2", $newPassword, $dbQuery);
-	$dbQuery = str_replace("/?3", $offers, $dbQuery);
-	$dbQuery = str_replace("/?4", $account, $dbQuery);
-	$dbQuery = str_replace("/?5", $oldPassword, $dbQuery);
+        $dbQuery = str_replace("/?1", $address, $dbQuery);
+        $dbQuery = str_replace("/?2", $city, $dbQuery);
+        $dbQuery = str_replace("/?3", $state, $dbQuery);
+        $dbQuery = str_replace("/?4", $zip, $dbQuery);
+	$dbQuery = str_replace("/?5", $email, $dbQuery);
+	$dbQuery = str_replace("/?6", $newPassword, $dbQuery);
+	$dbQuery = str_replace("/?7", $offers, $dbQuery);
+	$dbQuery = str_replace("/?8", $account, $dbQuery);
+	$dbQuery = str_replace("/?9", $oldPassword, $dbQuery);
 	$result = getDBResultAffected($dbQuery);
 	jsonResponse($result);
 }
