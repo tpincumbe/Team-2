@@ -37,6 +37,7 @@ $command = "";
 	loadAccountInfo - Loads the account info for the update account page
 	updateAccount - Updates the account info
 	register - Registers a new user account
+	retrieveVideos - Retrieves the list of videos for ezgotv
  */
 
 /* A list of all the session variables
@@ -743,6 +744,10 @@ if (strcasecmp($command, 'login') == 0) {
     }
     //Return the data array to the client as a json object
     jsonResponse($output);
+//Retrieves the list of videos for ezgotv
+} else if (strcasecmp($command, 'retrieveVideos') == 0){
+    $data = array ("com" => 'retrieveVideos');
+    print_r(do_post_request($data));
 }
 
 function jsonResponse($param, $print = true, $header = true) {

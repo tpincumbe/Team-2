@@ -43,19 +43,16 @@
 
 	</div><!-- /header -->
 
-	<div id="errors" name="errors"></div>
+	<div id="errors" name="errors"></div><br/>
+	<div id="zip" name="zip">
+		<fieldset class="ui-grid-a">
+			<div class="ui-block-a"><input type="number" placeholder="Enter Zip Code" name="zipField" id="zipField" maxlength="8"/></div>
+			<div class="ui-block-b"><button type="submit" onclick="panToZip()">Go</button></div>
+		</fieldset>
+	</div>
+	
 	<div id="map_canvas" name="map_canvas" style="width:100%; height:100%; position:absolute;"></div>
 	<div id="content" data-role="content"></div>
-
-	<div data-role="footer" data-id="footerBar" data-position="fixed"> 
-		<div data-role="navbar">
-			<ul>
-				<li><a href="contactUs.html">Contact Us</a></li> 
-				<li><a href="http://www.shopezgo.com/">Full Site</a></li> 
-			</ul>
-		</div><!-- /navbar -->
-	</div> 
-
 </div><!-- /page -->
 
 </body>

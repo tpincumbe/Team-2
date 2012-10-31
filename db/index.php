@@ -170,6 +170,8 @@ if (isset($request['com'])){
         if(isset($request['zip'])){$zip=$request['zip'];}
         if(isset($request['offers'])){$offers=$request['offers'];}
         registerNewAccount($uname, $pwd, $email, $address, $city, $state, $zip, $offers);
+    } else if (strcasecmp($command, 'retrieveVideos') == 0){
+        retrieveVideos();
     }
 } 
 
@@ -586,6 +588,31 @@ function registerNewAccount($uname, $pwd, $email, $address, $city, $state, $zip,
                     );
     }
     jsonResponse($result);
+}
+
+//Retrieves the list of videos from the Database
+function retrieveVideos(){
+    global $queries;
+    $dbQuery = $queries['retrieveVideos'];
+    $result = getDBResultsArray($dbQuery);
+    
+    $output = array();  
+    if (!$result) {
+    }else {
+	$i = 0;
+	foreach($result as $row){
+	    $out = array(
+                "Row" => $i,
+                "ID" => $row['id'],
+                "Title" => $row['Title'],
+                "URL" => $row['URL'],
+                "Image" => $row['Image'],
+                "Category" => $row['Category']
+                );
+            $output[$i++] = $out;
+	}
+    }
+    jsonResponse($output);
 }
 
 /**

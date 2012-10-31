@@ -23,9 +23,9 @@ function initialize() {
          
          google.maps.event.addListener(map, 'zoom_changed',
          function() {
-              if (map.getZoom() < minZoom) {
+              /*if (map.getZoom() < minZoom) {
                   map.setZoom(minZoom);
-              }else if (map.getZoom() > maxZoom){
+              }else*/ if (map.getZoom() > maxZoom){
                   map.setZoom(maxZoom);
               };
           });
@@ -115,6 +115,18 @@ function displayDealers(dealers){
 			 }
 		 })(marker, i));
 	 }
+}
+
+function panToZip(){
+         var zip = $('#zipField').val();
+         var geocoder = new google.maps.Geocoder();
+         geocoder.geocode({address: zip},
+                  function(results_array, status) { 
+                    var lat = results_array[0].geometry.location.lat();
+                    var lng = results_array[0].geometry.location.lng();
+                    userLoc = new google.maps.LatLng(lat, lng);
+                    map.panTo(userLoc);
+         });
 }
 
 /**
