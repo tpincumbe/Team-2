@@ -36,6 +36,15 @@
 .video {
 	color: black;
 }
+
+#contact {
+	text-align: center;
+}
+
+#misc{
+	text-align: center;
+}
+
 .ui-bar-a {
 	border: 1px solid 		#333 /*{a-bar-border}*/;
 	background: 			#111 /*{a-bar-background-color}*/;
