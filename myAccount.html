@@ -21,8 +21,7 @@
 			<a href="index.html"><span></span></a>
 		</div>
 		<!-- This is changed in loginHeader.js as necesary -->
-		<a href="myAccount.html" class="myAccountLink" id="myAccountLink">My Account</a>
-		<a href="login.html" onClick="logout()" class="loginLink" id="loginLink">Login</a>
+		<a onclick="myAccount()">My Account</a>
 		<div data-role="navbar">
 			<ul>
 				<li><a href="myVehicle.html">My Vehicle</a></li>
@@ -39,6 +38,7 @@
 		<button onClick="updateAccount()">Update Account</button>
 		<button onClick="accountVehicles()">Account Vehicles</button>
 		<button onClick="shoppingCart()">Shopping Cart</button>
+		<button onClick="logout()">Log Out</button>
 	</div><!-- /content -->
 
 	<div data-role="footer" data-id="footerBar" data-position="fixed"> 
