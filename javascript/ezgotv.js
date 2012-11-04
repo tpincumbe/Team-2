@@ -54,11 +54,11 @@ function Video(id, title, content, mlink, thumbnail, height, width){
 }
 
 function parseList(videos){
-  installations = "<table><br/><tr><br/>";
-  featured = "<table><br/><tr><br/>";
-  maintenance = "<table><br/><tr><br/>";
-  performance = "<table><br/><tr><br/>";
-  misc = "<table><br/><tr><br/>";
+  installations = "<table align='center'><tr>";
+  featured = "<table align='center'><tr>";
+  maintenance = "<table align='center'><tr>";
+  performance = "<table align='center'><tr>";
+  misc = "<table align='center'><tr>";
   
   for (var i = 0; i < videos.length; i++){
     var str = '<tr><td>\n'

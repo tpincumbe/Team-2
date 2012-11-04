@@ -5,18 +5,17 @@ $.ajax({
         context: document.body,
         data: {'com': 'loginHeader'},
         success: function(response, textStatus, jqXHR){
-		if (response.userName != undefined) {
-			userName = response.userName;
-		}
-		//If login was successful, display name
-		if (userName != null) {
-			$('#myAccountLink').css('display', 'inline-block');
-			$('#loginLink').text("Logout");
-		} else {
-		//Otherwise, just display login
-			$('#loginLink').text("Login");
-			$('#myAccountLink').css('display', 'none');
-		}
+			if (response.userName != undefined) {
+				userName = response.userName;
+			}
+			//If login was successful, display name
+			if (userName != null) {
+				$('#myAccountLink').css('display', 'inline-block');
+				$('#loginLink').text("Logout");
+			} else {
+			//Otherwise, just display login
+				$('.myAccountLink').hide();
+			}
         },
         error: function(jqXHR, textStatus, errorThrown){
             // log the error to the console
@@ -25,8 +24,7 @@ $.ajax({
                 textStatus, errorThrown
             );
 		//Cancel login
-		$('.logout').remove();
-		$('.loginLink').replaceWith('<a href="login.html"  class="loginLink">Login</a>');
+		$('.logout').remove(); 
 		//$('#headerBar').trigger('create');
 		$(document).trigger('pagecreate');
         }
@@ -34,7 +32,8 @@ $.ajax({
 
 //Logs out the user
 function logout() {
-$.ajax({
+	window.location() = "login.html";
+	$.ajax({
         url: "server/functions.php",
         type: "post",
         context: document.body,

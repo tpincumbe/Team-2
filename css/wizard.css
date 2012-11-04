@@ -5,8 +5,7 @@ background:white;
 
 .loginLink
 {
-margin-top:2px;
-padding-right:5px;
+align: right !important;
 }
 .loginLink a
 {
