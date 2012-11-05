@@ -93,7 +93,7 @@ if (strcasecmp($command, 'login') == 0) {
 	//If login successful, save info to session
 	if($account['auth']) {
 		$_SESSION['uname'] = $account['userName'];	  	
-    		$_SESSION['uid'] = $account['accountID'];
+    	$_SESSION['uid'] = $account['accountID'];
 	}
 	//Return the data array to the client as a json object
 	jsonResponse($account);
@@ -136,20 +136,26 @@ if (strcasecmp($command, 'login') == 0) {
 //Loads the info for vehicleResults.js
 } else if (strcasecmp($command, 'vehicleResultsLoad') == 0){
 	//Get the serial number from the session
-	$serial = $_SESSION['tempSerialNumber'];
+	$serial = null;
+	if (isset($_SESSION['tempSerialNumber']))
+		$serial = $_SESSION['tempSerialNumber'];
 	$output = "";
 	$data = array();
 	//If the serial number is set, make a different db call than if its not
-	if(!empty($serial)) {
+	if($serial !== null) {
 		$data['com'] = "serialsearch";
 		$data['serialNumber'] = $serial;
 		$output = do_post_request($data);
 	} else {
 		$data['com'] = "selectVehicleResults";
-		$data['model'] = $_SESSION['tempModel'];
-		$data['fuel'] = $_SESSION['tempFuel'];
-		$data['submodel'] = $_SESSION['tempSubmodel'];
-		$data['year'] = $_SESSION['tempYear'];
+		if (isset($_SESSION['tempModel']))
+			$data['model'] = $_SESSION['tempModel'];
+		if (isset($_SESSION['tempFuel']))
+			$data['fuel'] = $_SESSION['tempFuel'];
+		if (isset($_SESSION['tempSubmodel']))
+			$data['submodel'] = $_SESSION['tempSubmodel'];
+		if (isset($_SESSION['tempYear']))
+			$data['year'] = $_SESSION['tempYear'];
 		$output = do_post_request($data);
 	}
 	//Decode response
@@ -177,8 +183,11 @@ if (strcasecmp($command, 'login') == 0) {
 	jsonResponse(true);
 //Saves the selected vehicle to the session
 } else if (strcasecmp($command, 'vehicleResultsSessionSave') == 0){
-	$serialNumber = $_SESSION['tempSerialNumber'];	
-	$vehicle = $_SESSION['tempVehicle'];	
+	$serialNumber = ""; $vehicle = "";
+	if (isset($_SESSION['tempSerialNumber']))
+		$serialNumber = $_SESSION['tempSerialNumber'];
+	if (isset($_SESSION['tempVehicle']))	
+		$vehicle = $_SESSION['tempVehicle'];	
 	//Remove the temporary serial number
 	unset($_SESSION['tempSerialNumber']);
 	unset($_SESSION['tempModel']);
@@ -192,8 +201,11 @@ if (strcasecmp($command, 'login') == 0) {
 //Loads the filter for the parts page
 } else if (strcasecmp($command, 'partsFilterLoad') == 0){
 	//Get the serial number from the session
-	$serial = $_SESSION['currentSerialNumber'];
-	$vehicle = $_SESSION['currentVehicle'];
+	$serial = ""; $vehicle = "";
+	if (isset($_SESSION['currentSerialNumber']))
+		$serial = $_SESSION['currentSerialNumber'];
+	if (isset($_SESSION['currentVehicle']))
+		$vehicle = $_SESSION['currentVehicle'];
 	if (strcasecmp($serial, "") == 0) {
 		$vehicle = array(
 			"found" => false
@@ -234,8 +246,10 @@ if (strcasecmp($command, 'login') == 0) {
 //Loads the fuels for the select fuel page
 }else if (strcasecmp($command, 'selectFuelLoad') == 0){
 	//Get the model from the session
-	$modelId = $_SESSION['tempModel'];
-        $data = array();
+	$modelId = "";
+	if (isset($_SESSION['tempModel']))
+		$modelId = $_SESSION['tempModel'];
+    $data = array();
 	//Call the database
         $data['com'] = "selectFuelLoad";
 	$data['model'] = $modelId;
@@ -264,9 +278,12 @@ if (strcasecmp($command, 'login') == 0) {
 //Loads the submodels for the select submodel page
 }else if (strcasecmp($command, 'selectSubmodelLoad') == 0){
 	//Get the model and fuel from the session
-	$modelId = $_SESSION['tempModel'];
-	$fuelId = $_SESSION['tempFuel'];
-        $data = array();
+	$modelId = ""; $fuelId = "";
+	if (isset($_SESSION['tempModel']))
+		$modelId = $_SESSION['tempModel'];
+	if (isset($_SESSION['tempFuel']))
+		$fuelId = $_SESSION['tempFuel'];
+    $data = array();
 	//Call the database
         $data['com'] = "selectSubmodelLoad";
 	$data['model'] = $modelId;
@@ -295,11 +312,14 @@ if (strcasecmp($command, 'login') == 0) {
 //Loads the years for the select year page
 }else if (strcasecmp($command, 'selectYearLoad') == 0){
 	//Get the model, fuel and submodel from the session
-	$modelId = $_SESSION['tempModel'];
-	$fuelId = $_SESSION['tempFuel'];
-	$submodelId = $_SESSION['tempSubmodel'];
+	if (isset($_SESSION['tempModel']))
+		$modelId = $_SESSION['tempModel'];
+	if (isset($_SESSION['tempFuel']))
+		$fuelId = $_SESSION['tempFuel'];
+	if (isset($_SESSION['tempSubmodel']))
+		$submodelId = $_SESSION['tempSubmodel'];
 	//Call the database
-        $data['com'] = "selectYearLoad";
+    $data['com'] = "selectYearLoad";
 	$data['model'] = $modelId;
 	$data['fuel'] = $fuelId;
 	$data['submodel'] = $submodelId;
@@ -330,10 +350,12 @@ if (strcasecmp($command, 'login') == 0) {
 	unset($_SESSION['uid']);
 //Loads the vehicles for the current user
 } else if (strcasecmp($command, 'accountVehiclesLoad') == 0) {
-	$accountId = $_SESSION['uid'];
-        $data = array();
+	$accountId = "";
+	if (isset($_SESSION['uid']))
+		$accountId = $_SESSION['uid'];
+    $data = array();
 	//Call the database
-        $data['com'] = "accountVehiclesLoad";
+    $data['com'] = "accountVehiclesLoad";
 	$data['account'] = $accountId;
 
         $output = do_post_request($data);
@@ -402,7 +424,10 @@ if (strcasecmp($command, 'login') == 0) {
 //Loads the parts categories for the parts category page
 } else if (strcasecmp($command, 'partCategoryLoad') == 0) {
 	//Check for a vehicle filter
-	$filter = $_SESSION['currentSerialNumber'];
+	$filter = "";
+	if (isset($_SESSION['currentSerialNumber'])){
+		$filter = $_SESSION['currentSerialNumber'];
+	}
 	//Get the categories from the database
 	$data = array();
 	//Change query based on if there is a filter or not
@@ -425,15 +450,22 @@ if (strcasecmp($command, 'login') == 0) {
 	}
 //Loads the part search results	
 } else if (strcasecmp($command, 'partsSearchLoadResults') == 0) {
-	$part = $_SESSION['partSearchQuery'];
+	$part = "";
+	if (isset($_SESSION['partSearchQuery'])){
+		$part = $_SESSION['partSearchQuery'];
+	}
 	//If part is not empty, get search results.  Otherwise get select results	
 	if (!empty($part)) {
 		$data['com'] = "partsSearch";
 		$data['query'] = $part;
 	} else {
-		$filter = $_SESSION['currentSerialNumber'];
-		$subcategory = $_SESSION['tempSubcategory'];
-		if(!empty($filter)) {
+		$filter = null;
+		$subcategory = "";
+		if (isset($_SESSION['currentSerialNumber']))
+			$filter = $_SESSION['currentSerialNumber'];
+		if (isset($_SESSION['tempSubcategory']))
+			$subcategory = $_SESSION['tempSubcategory'];
+		if($filter !== null) {
 			$data['com'] = "selectPartResultsFiltered";
 			$data['subcategory'] = $subcategory;	
 			$data['filter'] = $filter;	
@@ -468,8 +500,11 @@ if (strcasecmp($command, 'login') == 0) {
 //Loads the part info for the part info results
 } else if (strcasecmp($command, 'partInfoLoad') == 0) {
 	//Get the part number from the session
-	$part = $_SESSION['currentPartNumber'];
-        $data = array();
+	$part = "";
+	if (isset($_SESSION['currentPartNumber'])){
+		$part = $_SESSION['currentPartNumber'];
+	}
+    $data = array();
 	//Call the database
         $data['com'] = "partInfoLoad";
 	$data['part'] = $part;
@@ -499,8 +534,11 @@ if (strcasecmp($command, 'login') == 0) {
 //Loads the list of subcategories
 } else if (strcasecmp($command, 'selectSubcategoryLoad') == 0) {
 	//Check for a vehicle filter
-	$filter = $_SESSION['currentSerialNumber'];
-	$category = $_SESSION['tempCategory'];
+	$filter = ""; $category = "";
+	if (isset($_SESSION['currentSerialNumber']))
+		$filter = $_SESSION['currentSerialNumber'];
+	if (isset($_SESSION['tempCategory']))
+		$category = $_SESSION['tempCategory'];
 	//Get the subategories from the database
 	$data = array();
 	//Change query based on if there is a filter or not
@@ -533,13 +571,18 @@ if (strcasecmp($command, 'login') == 0) {
 	jsonResponse(true);
 //Saves the vehicle to the account
 } else if (strcasecmp($command, 'vehicleResultsAccountSave') == 0) {
-	$accountId = $_SESSION['uid'];
+	$accountId = null;
+	if (isset($_SESSION['uid']))
+		$accountId = $_SESSION['uid'];
 	//Make sure the user is logged in.
-	if (empty($accountId)) {
+	if ($accountId === null) {
 		jsonResponse("Login to save a vehicle to your account.");
 	}
-	$serialNumber = $_SESSION['tempSerialNumber'];	
-	$vehicle = $_SESSION['tempVehicle'];	
+	$serialNumber = ""; $vehicle = "";
+	if (isset($_SESSION['tempSerialNumber']))
+		$serialNumber = $_SESSION['tempSerialNumber'];
+	if (isset($_SESSION['tempVehicle']))	
+		$vehicle = $_SESSION['tempVehicle'];	
 	//Remove the temporary serial number
 	unset($_SESSION['tempSerialNumber']);
 	unset($_SESSION['tempModel']);
@@ -556,7 +599,9 @@ if (strcasecmp($command, 'login') == 0) {
 	jsonResponse(true);
 //Removes vehicle from account
 } else if (strcasecmp($command, 'accountVehicleRemove') == 0) {
-	$accountId = $_SESSION['uid'];
+	$accountId = "";
+	if (isset($_SESSION['uid']))
+		$accountId = $_SESSION['uid'];
 	$serialNumber = "";
 	//Make sure the user is logged in.
 	if (isset($request['serial'])){
@@ -571,10 +616,12 @@ if (strcasecmp($command, 'login') == 0) {
 	jsonResponse(true);
 //Load shopping cart
 } else if (strcasecmp($command, 'shoppingCartLoad') == 0) {
-	$accountId = $_SESSION['uid'];
+	$accountId = "";
+	if (isset($_SESSION['uid']))
+		$accountId = $_SESSION['uid'];
         $data = array();
 	//Call the database
-        $data['com'] = "shoppingCartLoad";
+    $data['com'] = "shoppingCartLoad";
 	$data['account'] = $accountId;
         $output = do_post_request($data);
 	//Decode response
@@ -591,12 +638,16 @@ if (strcasecmp($command, 'login') == 0) {
 	}
 //Add part to shopping cart
 } else if (strcasecmp($command, 'addToCart') == 0) {
-	$accountId = $_SESSION['uid'];
+	$accountId = "";
+	if (isset($_SESSION['uid']))
+		$accountId = $_SESSION['uid'];
 	//Make sure the user is logged in.
 	if (empty($accountId)) {
 		jsonResponse("Login to use the shopping cart.");
 	} else {
-		$partNumber = $_SESSION['currentPartNumber'];	
+		$partNumber = "";
+		if (isset($_SESSION['currentPartNumber']))
+			$partNumber = $_SESSION['currentPartNumber'];	
 		//Remove the temporary part number
 		unset($_SESSION['currentPartNumber']);	
 		//Save to account
@@ -609,7 +660,9 @@ if (strcasecmp($command, 'login') == 0) {
 	}
 //Remove part from shopping cart
 } else if (strcasecmp($command, 'shoppingCartRemove') == 0) {
-	$accountId = $_SESSION['uid'];
+	$accountId = "";
+	if (isset($_SESSION['uid']))
+		$accountId = $_SESSION['uid'];
 	$partNumber = "";
 	if (isset($request['part'])){
 		$partNumber = $request['part'];
@@ -622,7 +675,9 @@ if (strcasecmp($command, 'login') == 0) {
 	jsonResponse(true);
 //Removes everything from shopping cart for checkout
 } else if (strcasecmp($command, 'checkout') == 0) {
-	$accountId = $_SESSION['uid'];
+	$accountId = "";
+	if (isset($_SESSION['uid']))
+		$accountId = $_SESSION['uid'];
 	$data = array();
 	$data['com'] = "checkout";
 	$data['account'] = $accountId;
@@ -630,7 +685,9 @@ if (strcasecmp($command, 'login') == 0) {
 	jsonResponse(true);
 //Loads the account info
 } else if (strcasecmp($command, 'loadAccountInfo') == 0) {
-	$accountId = $_SESSION['uid'];
+	$accountId = "";
+	if (isset($_SESSION['uid']))
+		$accountId = $_SESSION['uid'];
         $data = array();
 	//Call the database
         $data['com'] = "loadAccountInfo";
@@ -639,7 +696,9 @@ if (strcasecmp($command, 'login') == 0) {
         print_r($output);
 //Updates account info
 } else if (strcasecmp($command, 'updateAccount') == 0) {
-	$accountId = $_SESSION['uid'];
+	$accountId = "";
+	if (isset($_SESSION['uid']))
+		$accountId = $_SESSION['uid'];
 	$oldPassword = "";
 	
 	if (isset($request['oldPassword'])){
