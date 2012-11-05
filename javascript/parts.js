@@ -15,7 +15,13 @@ $.ajax({
 				var fuel = response.data.fuel;
 				var submodel = response.data.submodel;
 				var year = response.data.year;
-				$('#partsOverviewContent').replaceWith('<div id = "partsOverviewContent" name = "partsOverviewContent" > Currently Selected Vehicle: <br> Model: ' + model + '<br/>Fuel: ' + fuel + '<br/>Submodel: ' + submodel + '<br/>Year: ' + year + '<button onClick="cancel()" id="removeFilterButton" name="removeFilterButton">Remove Vehicle Filter</button></div>');
+				var image = response.data.image;
+				var div = '<div id = "partsOverviewContent" name = "partsOverviewContent" > Currently Selected Vehicle: <br/>';
+				if (image != null) {
+					div = div + '<img src = "' + image + '"/><br/>';
+				}
+				div = div + 'Model: ' + model + '<br/>Fuel: ' + fuel + '<br/>Submodel: ' + submodel + '<br/>Year: ' + year + '<button onClick="cancel()" id="removeFilterButton" name="removeFilterButton">Remove Vehicle Filter</button>' + '</div>';
+				$('#partsOverviewContent').replaceWith(div);
 				$('#partsOverviewContent').trigger('create');
 			} else {
 				//Display general parts info

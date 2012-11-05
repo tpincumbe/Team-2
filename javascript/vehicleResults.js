@@ -14,7 +14,13 @@ $.ajax({
 			var fuel = response.data.fuel;
 			var submodel = response.data.submodel;
 			var year = response.data.year;
-			$('#vehicleResultsContent').replaceWith('<div id = "vehicleResultsContent" name = "vehicleResultsContent" > Model: ' + model + '<br/>Fuel: ' + fuel + '<br/>Submodel: ' + submodel + '<br/>Year: ' + year + '</div>');
+			var image = response.data.image;
+			var div = '<div id = "vehicleResultsContent" name = "vehicleResultsContent" >';
+			if (image != null) {
+				div = div + '<img src = "' + image + '"/><br/>';
+			}
+			div = div + 'Model: ' + model + '<br/>Fuel: ' + fuel + '<br/>Submodel: ' + submodel + '<br/>Year: ' + year + '</div>';
+			$('#vehicleResultsContent').replaceWith(div);
 			$('#vehicleResultsContent').trigger('create');
 		}
         },

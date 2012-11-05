@@ -12,6 +12,9 @@ $.ajax({
 			var vehicles = response.data;
 			var string = '<div id = "accountVehiclesContent" name = "accountVehiclesContent" >';
 			$.each(vehicles, function(index, value) {
+				if (value.image != null) {
+					string = string + '<img src = "' + value.image + '"/><br/>';
+				}
 				string = string + 'Model: ' + value.model + '<br/>Fuel: ' + value.fuel 
 					+ '<br/>Submodel: '+ value.submodel + '<br/>Year: ' + value.year;
 				string = string + '<button onclick="selectVehicle(value)" value="' + value.serialNumber + '">Select Vehicle</button><br/>';
