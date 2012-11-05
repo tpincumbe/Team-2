@@ -15,8 +15,14 @@ $.ajax({
 			var price = part.price;
 			var category = part.categoryName;
 			var subcategory = part.subcategoryName;
-			var availability = part.availability
-			$('#partInfoResultContent').replaceWith('<div id = "partInfoResultContent" name = "partInfoResultContent" > Name: ' + partName + '<br/>Description: ' + description + '<br/>Price: ' + price + '<br/>Category: ' + category + '<br/>Subcategory: ' + subcategory + '<br/>Availability: ' + availability + '</div>');
+			var availability = part.availability;
+			var image = response.data.image;
+			var div = '<div id = "partInfoResultContent" name = "partInfoResultContent" >';
+			if (image != null) {
+				div = div + '<img src = "' + image + '"/><br/>';
+			}
+			 div = div + 'Name: ' + partName + '<br/>Description: ' + description + '<br/>Price: ' + price + '<br/>Category: ' + category + '<br/>Subcategory: ' + subcategory + '<br/>Availability: ' + availability + '</div>';
+			$('#partInfoResultContent').replaceWith(div);
 			$('#partInfoResultContent').trigger('create');
 		}
         },

@@ -12,6 +12,9 @@ $.ajax({
 			var parts = response.data;
 			var string = '<div id = "partsSearchResultsContent" name = "partsSearchResultsContent" >';
 			$.each(parts, function(index, value) {
+				if (value.image != null) {
+					string = string + '<img src = "' + value.image + '"/><br/>';
+				}
 				string = string + 'Name: ' + value.name + '<br/>Number: ' + value.partNumber + '<br>Price: ' + value.price + '<button onclick="selectPart(value)" value="' + value.partNumber + '">' + 'View ' + value.name + '</button><br/>'
 			});
 			string = string + '</div>';

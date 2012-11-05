@@ -11,6 +11,9 @@ $.ajax({
 			var string = '<div id = "productList" name = "productList" >';
 			string = string + "Items in Cart: </br></br>";
 			$.each(parts, function(index, value) {
+				if (value.image != null) {
+					string = string + '<img src = "' + value.image + '"/><br/>';
+				}
 				string = string + 'Name: ' + value.name + '<br/>Price: '+ value.price;
 				string = string + '<button onclick="removePart(value)" value="' + value.partNumber + '">Remove Part</button><br/>';
 				sum = sum + parseFloat(value.price);
