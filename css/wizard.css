@@ -1,3 +1,49 @@
+#headerimg {
+	width: 483px;
+	height: 50px;
+	margin: 0px auto;
+	display: block;
+	background-image: url(../images/shopezgomainlogo.jpg) inherit;
+}
+
+#headerimg a{
+	width: 483px;
+	height: 50px;
+	margin: 0px auto;
+	display: block;
+	background: #fff url(../images/shopezgomainlogo.jpg) no-repeat;
+}
+
+#headerimg a span{
+	visibility: hidden;	
+}
+
+.video {
+	color: black;
+}
+
+.videos{
+	background: white;
+	width: 99%;
+}
+
+#partsSearchResultsContent{
+	background: white;
+}
+
+.videoCategories{
+	padding-top: 5px !important;
+}
+
+#contact {
+	text-align: center;
+}
+
+#misc{
+	text-align: center;
+	font-size: 14pt;
+}
+
 .ui-header-fixed
 {
 background:white;

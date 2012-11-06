@@ -6,16 +6,16 @@ $.ajax({
         success: function(response, textStatus, jqXHR){
 		if (!response.success) {
 			//There was some kind of php error
-			alert(response.errors.reason);
+			$('#partsSearchResultsContent').append('No Parts Found');
 		} else {
 			//Display the Part information
 			var parts = response.data;
-			var string = '<div id = "partsSearchResultsContent" name = "partsSearchResultsContent" >';
+			var string = '<div id = "partsSearchResultsContent" name = "partsSearchResultsContent" align="center">';
 			$.each(parts, function(index, value) {
 				if (value.image != null) {
 					string = string + '<img src = "' + value.image + '"/><br/>';
 				}
-				string = string + 'Name: ' + value.name + '<br/>Number: ' + value.partNumber + '<br>Price: ' + value.price + '<button onclick="selectPart(value)" value="' + value.partNumber + '">' + 'View ' + value.name + '</button><br/>'
+				string = string + 'Name: ' + value.name + '<br/>Number: ' + value.partNumber + '<br>Price: $' + value.price + '<button onclick="selectPart(value)" value="' + value.partNumber + '">' + 'View ' + value.name + '</button><br/>'
 			});
 			string = string + '</div>';
 			$('#partsSearchResultsContent').replaceWith(string);

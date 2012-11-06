@@ -78,7 +78,8 @@ if (isset($request['com'])){
 	    partCategoryLoadFilter($filter);
 	}
     } else if(strcasecmp($command, 'selectPartResultsAll') == 0){
-	if(isset($request['subcategory'])) {
+    	$subcategory = "";
+		if(isset($request['subcategory'])) {
             $subcategory = mysql_real_escape_string($request['subcategory']);
 	    selectPartResultsAll($subcategory);
 	}
@@ -410,7 +411,7 @@ function selectPartResultsAll($subcategory) {
 	if (!$result) {
 		jsonResponse(false);
 	} else {
-	    	jsonResponse($result);
+	    jsonResponse($result);
 	}
 }
 
@@ -425,7 +426,7 @@ function selectPartResultsFiltered($subcategory, $filter) {
 	if (!$result) {
 		jsonResponse(false);
 	} else {
-	    	jsonResponse($result);
+	    jsonResponse($result);
 	}
 }
 

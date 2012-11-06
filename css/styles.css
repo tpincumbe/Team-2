@@ -12,48 +12,6 @@
 /* Swatches */
 /* A
 -----------------------------------------------------------------------------------------------------------*/
-
-#headerimg {
-	width: 483px;
-	height: 50px;
-	margin: 0px auto;
-	display: block;
-	background-image: url(../images/shopezgomainlogo.jpg) inherit;
-}
-
-#headerimg a{
-	width: 483px;
-	height: 50px;
-	margin: 0px auto;
-	display: block;
-	background: #fff url(../images/shopezgomainlogo.jpg) no-repeat;
-}
-
-#headerimg a span{
-	visibility: hidden;	
-}
-
-.video {
-	color: black;
-}
-
-.videos{
-	background: white;
-	width: 99%;
-}
-
-.videoCategories{
-	padding-top: 5px !important;
-}
-
-#contact {
-	text-align: center;
-}
-
-#misc{
-	text-align: center;
-}
-
 .ui-bar-a {
 	border: 1px solid 		#333 /*{a-bar-border}*/;
 	background: 			#111 /*{a-bar-background-color}*/;

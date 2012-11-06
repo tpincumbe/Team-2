@@ -25,7 +25,7 @@ $.ajax({
 				$('#partsOverviewContent').trigger('create');
 			} else {
 				//Display general parts info
-				$('#partsOverviewContent').replaceWith('<div id = "partsOverviewContent" name = "partsOverviewContent" > Parts!</div>');
+				$('#partsOverviewContent').replaceWith('<div id = "partsOverviewContent" name = "partsOverviewContent"></div>');
 				$('#partsOverviewContent').trigger('create');
 			}
 		}
