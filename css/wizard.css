@@ -44,7 +44,7 @@
 	font-size: 14pt;
 }
 
-#vehicleResultsContent{
+#vehicleResultsContent, #partsOverviewContent, #partInfoResultContent{
 	text-align: center;
 	font-size: 14pt;
 	background: white;
