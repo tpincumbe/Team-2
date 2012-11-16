@@ -44,6 +44,12 @@
 	font-size: 14pt;
 }
 
+#vehicleResultsContent, #partsOverviewContent, #partInfoResultContent{
+	text-align: center;
+	font-size: 14pt;
+	background: white;
+}
+
 .ui-header-fixed
 {
 background:white;
