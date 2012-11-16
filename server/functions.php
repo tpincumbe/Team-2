@@ -407,6 +407,7 @@ if (strcasecmp($command, 'login') == 0) {
 	//Call the database
         $data['com'] = "partsSearch";
 	$data['query'] = $part;
+	$data['start'] = 0;
         $output = do_post_request($data);
 	//Decode response
 	$response = json_decode($output, true);
@@ -473,6 +474,12 @@ if (strcasecmp($command, 'login') == 0) {
 			$data['com'] = "selectPartResultsAll";
 			$data['subcategory'] = $subcategory;	
 		}
+	}
+	//Get the starting point of the search results to display
+	if (isset($request['start'])) {
+		$data['start'] = $request['start'];
+	} else {
+		$data['start'] = 0;
 	}
 	$output = do_post_request($data);
 	$response = json_decode($output, true);

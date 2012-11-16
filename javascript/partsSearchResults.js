@@ -1,8 +1,12 @@
+getResults(0);
+
+//Loads the results
+function getResults(start) {
 $.ajax({
         url: "server/functions.php",
         type: "post",
         context: document.body,
-        data: {'com': 'partsSearchLoadResults'},
+        data: {'com': 'partsSearchLoadResults', 'start': start},
         success: function(response, textStatus, jqXHR){
 		if (!response.success) {
 			//There was some kind of php error
@@ -17,6 +21,13 @@ $.ajax({
 				}
 				string = string + 'Name: ' + value.name + '<br/>Number: ' + value.partNumber + '<br>Price: $' + value.price + '<button onclick="selectPart(value)" value="' + value.partNumber + '">' + 'View ' + value.name + '</button><br/>'
 			});
+			//Add the previous and next button if necesary
+			if (start > 0) {
+				string = string + '<button onclick="getResults(' + (start - 10) + ')"> Previous 10 </button>'
+			}
+			if (parts.length == 10) {
+					string = string + '<button onclick="getResults(' + (start + 10) + ')"> Next 10 </button>'	
+			}
 			string = string + '</div>';
 			$('#partsSearchResultsContent').replaceWith(string);
 			$('#partsSearchResultsContent').trigger('create');
@@ -30,6 +41,7 @@ $.ajax({
             );
         }
     });
+}
 
 //Selects the Part
 function selectPart(value) {

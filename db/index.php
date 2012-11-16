@@ -66,9 +66,10 @@ if (isset($request['com'])){
 	    accountVehiclesLoad($account);
 	}
     } else if(strcasecmp($command, 'partsSearch') == 0){
-	if(isset($request['query'])) {
+	if(isset($request['query']) && isset($request['start'])) {
             $search = mysql_real_escape_string($request['query']);
-	    partsSearch($search);
+	    $start = mysql_real_escape_string($request['start']);
+	    partsSearch($search, $start);
 	}
     } else if(strcasecmp($command, 'partCategoryLoadAll') == 0){
     	partCategoryLoadAll();
@@ -79,15 +80,17 @@ if (isset($request['com'])){
 	}
     } else if(strcasecmp($command, 'selectPartResultsAll') == 0){
     	$subcategory = "";
-		if(isset($request['subcategory'])) {
+		if(isset($request['subcategory']) && isset($request['start'])) {
             $subcategory = mysql_real_escape_string($request['subcategory']);
-	    selectPartResultsAll($subcategory);
+	    $start = mysql_real_escape_string($request['start']);
+	    selectPartResultsAll($subcategory, $start);
 	}
     } else if(strcasecmp($command, 'selectPartResultsFiltered') == 0){
-	if(isset($request['subcategory']) && isset($request['filter'])) {
+	if(isset($request['subcategory']) && isset($request['filter']) && isset($request['start'])) {
             $subcategory = mysql_real_escape_string($request['subcategory']);
             $filter = mysql_real_escape_string($request['filter']);
-	    selectPartResultsFiltered($subcategory, $filter);
+	    $start = mysql_real_escape_string($request['start']);
+	    selectPartResultsFiltered($subcategory, $filter, $start);
 	}
     } else if(strcasecmp($command, 'partInfoLoad') == 0){
 	if(isset($request['part'])) {
@@ -355,7 +358,7 @@ function accountVehiclesLoad($account) {
 }
 
 //Gets the vehicles saved to an account
-function partsSearch($search) {
+function partsSearch($search, $start) {
 	global $queries;
 	$dbQuery = $queries['partsSearch'];
 	$dbQuery = str_replace("/?1", $search, $dbQuery);
@@ -364,6 +367,7 @@ function partsSearch($search) {
 	$dbQuery = str_replace("/?4", $search, $dbQuery);
 	$dbQuery = str_replace("/?5", $search, $dbQuery);
 	$dbQuery = str_replace("/?6", $search, $dbQuery);
+	$dbQuery = str_replace("/?7", $start, $dbQuery);
 	    
 	$result = getDBResultsArray($dbQuery);
 	    
@@ -402,10 +406,11 @@ function partCategoryLoadFilter($filter) {
 }
 
 //Gets all the parts for a given subcateogry
-function selectPartResultsAll($subcategory) {
+function selectPartResultsAll($subcategory, $start) {
 	global $queries;
 	$dbQuery = $queries['selectPartResultsAll'];
 	$dbQuery = str_replace("/?1", $subcategory, $dbQuery);
+	$dbQuery = str_replace("/?2", $start, $dbQuery);
 	$result = getDBResultsArray($dbQuery);
 	    
 	if (!$result) {
@@ -416,11 +421,12 @@ function selectPartResultsAll($subcategory) {
 }
 
 //Gets all the parts for a given subcateogry with a vehicle filter
-function selectPartResultsFiltered($subcategory, $filter) {
+function selectPartResultsFiltered($subcategory, $filter, $start) {
 	global $queries;
 	$dbQuery = $queries['selectPartResultsFiltered'];
 	$dbQuery = str_replace("/?1", $subcategory, $dbQuery);
 	$dbQuery = str_replace("/?2", $filter, $dbQuery);
+	$dbQuery = str_replace("/?3", $start, $dbQuery);
 	$result = getDBResultsArray($dbQuery);
 	    
 	if (!$result) {
