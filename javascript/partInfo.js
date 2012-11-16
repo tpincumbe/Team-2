@@ -43,10 +43,15 @@ $.ajax({
         context: document.body,
         data: {'com': 'addToCart'},
         success: function(response, textStatus, jqXHR){
-		//Transition to the parts page		
-		var path = window.location.pathname;
-		path = path.substring(0, path.lastIndexOf('/'));
-		window.location = path + "/shoppingCart.html";
+		//Transition to the parts page	
+		var success = response.success;
+		if (!success) {
+			alert(response.errors.reason);
+		} else {	
+			var path = window.location.pathname;
+			path = path.substring(0, path.lastIndexOf('/'));
+			window.location = path + "/shoppingCart.html";
+		}
         },
         error: function(jqXHR, textStatus, errorThrown){
             // log the error to the console
