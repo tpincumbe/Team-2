@@ -11,6 +11,8 @@ function register(){
     if ($('#offersField').is(':checked')) {
         offers = 'Y'
     }
+    var valid = $('#registration').valid();
+    //alert(valid);
     
     if (password == confirmPassword){
         $.ajax({

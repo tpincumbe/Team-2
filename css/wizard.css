@@ -1,3 +1,7 @@
+accountVehiclesContent{
+	text-align: center;
+	background: white;
+}
 #headerimg {
 	width: 483px;
 	height: 50px;
@@ -36,6 +40,12 @@
 }
 
 #contact {
+	background: white;
+	text-align: center;
+}
+
+#productList{
+	background: white;
 	text-align: center;
 }
 
