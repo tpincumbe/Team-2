@@ -1,3 +1,12 @@
+//Bind enter key to input box
+$(document).live("pageinit", function() {
+	$('#partSearch').keypress(function(event) {
+		  if ( event.which == 13 ) {
+			  partsSearch();
+		   }
+	});
+});
+
 //Loads the filter
 $.ajax({
         url: "server/functions.php",

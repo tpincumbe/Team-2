@@ -1,3 +1,42 @@
+//Bind enter key to input box
+$(document).live("pageinit", function() {
+	$('#usernameField').keypress(function(event) {
+		  if ( event.which == 13 ) {
+			  $('#passwordField').focus();
+		   }
+	});
+	
+	$('#passwordField').keypress(function(event) {
+		  if ( event.which == 13 ) {
+			  $('#addressField').focus();
+		   }
+	});
+	
+	$('#confirmPasswordField').keypress(function(event) {
+		  if ( event.which == 13 ) {
+			  $('#addressField').focus();
+		   }
+	});
+	
+	$('#addressField').keypress(function(event) {
+		  if ( event.which == 13 ) {
+			  $('#zipField').focus();
+		   }
+	});
+	
+	$('#zipField').keypress(function(event) {
+		  if ( event.which == 13 ) {
+			  $('#emailField').focus();
+		   }
+	});
+	
+	$('#emailField').keypress(function(event) {
+		  if ( event.which == 13 ) {
+			  register();
+		   }
+	});
+});
+
 function register(){
     var uname = $('#usernameField').val();
     var password = $('#passwordField').val();

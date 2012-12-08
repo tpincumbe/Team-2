@@ -1,5 +1,14 @@
 var map, myOptions, userLoc, zoom, minZoom = 7, maxZoom = 12;
 
+//Bind enter key to input box
+$(document).live("pageinit", function() {
+	$('#zipField').keypress(function(event) {
+		  if ( event.which == 13 ) {
+			  panToZip();
+		   }
+	});
+});
+
 /*
 *	This function initializes the google map
 *	It centers the map at Georgia Tech and zooms it to show mainly the campus.

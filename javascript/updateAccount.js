@@ -1,9 +1,47 @@
-$.ajax({
-        url: "server/functions.php",
-        type: "post",
-        context: document.body,
-        data: {'com': 'loadAccountInfo'},
-        success: function(response, textStatus, jqXHR){
+//Bind enter key to input box
+$(document).live("pageinit", function() {	
+	$('#oldPasswordField').keypress(function(event) {
+		  if ( event.which == 13 ) {
+			  $('#newPasswordField').focus();
+		   }
+	});
+	
+	$('#newPasswordField').keypress(function(event) {
+		  if ( event.which == 13 ) {
+			  $('#confirmPasswordField').focus();
+		   }
+	});
+	
+	$('#confirmPasswordField').keypress(function(event) {
+		  if ( event.which == 13 ) {
+			  $('#addressField').focus();
+		   }
+	});
+	
+	$('#addressField').keypress(function(event) {
+		  if ( event.which == 13 ) {
+			  $('#zipField').focus();
+		   }
+	});
+	
+	$('#zipField').keypress(function(event) {
+		  if ( event.which == 13 ) {
+			  $('#emailField').focus();
+		   }
+	});
+	
+	$('#emailField').keypress(function(event) {
+		  if ( event.which == 13 ) {
+			  updateAccount();
+		   }
+	});
+	
+	$.ajax({
+	    url: "server/functions.php",
+	    type: "post",
+	    context: document.body,
+	    data: {'com': 'loadAccountInfo'},
+	    success: function(response, textStatus, jqXHR){
 		var resp = jQuery.parseJSON(response);
 		if (!resp.success) {
 			//There was some kind of php error
@@ -22,15 +60,17 @@ $.ajax({
 				$('#offersField').prop('checked', false);
 			}
 		}
-        },
-        error: function(jqXHR, textStatus, errorThrown){
-            // log the error to the console
-            console.log(
-                "The following error occured: "+
-                textStatus, errorThrown
-            );
-        }
-    });
+	    },
+	    error: function(jqXHR, textStatus, errorThrown){
+	        // log the error to the console
+	        console.log(
+	            "The following error occured: "+
+	            textStatus, errorThrown
+	        );
+	    }
+	});
+});
+
 
 //Updates account information
 function updateAccount() {

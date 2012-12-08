@@ -1,3 +1,12 @@
+//Bind enter key to input box
+$(document).live("pageinit", function() {
+	$('#serialNumber').keypress(function(event) {
+		  if ( event.which == 13 ) {
+		     serialNumberSearch();
+		   }
+	});
+});
+
 //Calls the code to search by serial number
 function serialNumberSearch() {
     serialNumber = $('#serialNumber').val();
