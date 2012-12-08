@@ -31,8 +31,9 @@ accountVehiclesContent{
 	width: 99%;
 }
 
-#partsSearchResultsContent{
+#partsSearchResultsContent, #accountVehiclesContent{
 	background: white;
+	text-align: center;
 }
 
 .videoCategories{
