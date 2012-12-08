@@ -6,14 +6,15 @@ $(document).live("pageinit", function() {
   retrieveVideoList();
   $('#videoCategories').change(function(){
 	  var cat = $('#videoCategories').val();
+	  
 	  if (cat == "inst"){
 		  showInstallation();
 	  }else if (cat == "feat"){
 		  showFeatured();
-	  }else if (cat = "maint"){
-		  showMaintenance
 	  }else if (cat == "perf"){
 		  showPerformance();
+	  }else if (cat == "maint"){
+		  showMaintenance();
 	  }
   });
 });

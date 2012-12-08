@@ -47,7 +47,7 @@ function updateAccount() {
 	offers = 'Y'
    }
    
-   if ((newPassword != '') && (newPassword != confirmPassword)){
+   if ((newPassword != '') && (newPassword != confirmPassword) ){
 	alert("New password does not match. Please try again.");
    }else {
 	$.ajax({
