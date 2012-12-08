@@ -22,6 +22,12 @@ accountVehiclesContent{
 	visibility: hidden;	
 }
 
+#myAccount{
+	position: absolute;
+	right: 0px;
+	left: auto;
+}
+
 .video {
 	color: black;
 }
