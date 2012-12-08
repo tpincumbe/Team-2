@@ -4,6 +4,18 @@ var installations, featured, maintenance, performance, misc;
 
 $(document).live("pageinit", function() {
   retrieveVideoList();
+  $('#videoCategories').change(function(){
+	  var cat = $('#videoCategories').val();
+	  if (cat == "inst"){
+		  showInstallation();
+	  }else if (cat == "feat"){
+		  showFeatured();
+	  }else if (cat = "maint"){
+		  showMaintenance
+	  }else if (cat == "perf"){
+		  showPerformance();
+	  }
+  });
 });
 
 /**
@@ -88,25 +100,6 @@ function parseList(videos){
   misc += "</table><br/>";
   
   showInstallation();
-}
-
-/**
- * Will write a thumbnail image and link onto the page for a user to click on
- */
-function printVideos(){
-  alert(numVideos);
-    var table = '<table>\n';
-    for(var i = 0; i < numVideos; i++){
-        var str = '<tr><td>\n'
-        str += '<a href="' + videos[i].mlink +'">\n';
-        str += '<img src="' + videos[i].thumbnail +'"/></a></td>\n';
-        str += '<td><a href="' + videos[i].mlink +'">\n';
-        str += videos[i].title + '\n';
-        str +=  '</a></td></tr>\n';
-        table  += str;
-    }
-    table += '</table>\n';
-    $('.videos').append(table);
 }
 
 function showInstallation(){

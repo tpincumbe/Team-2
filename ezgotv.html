@@ -35,16 +35,17 @@
 	</div><!-- /header -->
 	
 	<div data-role="content" id="outer" class="outer">
-		<div data-role="navbar">
-			<ul class="videoCategories">
-				<li><a onclick=showInstallation() class="ui-btn-active ui-state-persist">Installation</a></li>
-				<li><a onclick=showFeatured()>Featured</a></li>
-				<li><a onclick=showPerformance()>Performance</a></li>
-				<li><a onclick=showMaintenance()>Maintenance</a></li>
-			</ul>
+		<div class="selectorField" id="selectorField">
+			<div class="exp" id="exp">Select a video category</div>
+			<select class="videoCategories" id="videoCategories">
+				<option value="inst">Installation</option>
+				<option value="feat">Featured</option>
+				<option value="perf">Performance</option>
+				<option value="maint">Maintenance</option>
+			</select>
+			<br />
+			<div class="videos"></div>
 		</div>
-		<br />
-		<div class="videos"></div>
 	</div><!-- /content -->
 
 	<div data-role="footer" data-id="footerBar" data-position="fixed"> 
