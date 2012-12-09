@@ -55,9 +55,9 @@ $(document).live("pageinit", function() {
 			$('#stateField').selectmenu('refresh');
 			$('#zipField').val(resp.data.zip);
 			if (resp.data.offers == 'Y') {
-				$('#offersField').prop('checked', true);
+				$('#offersField').prop('checked', true).checkboxradio('refresh');
 			} else {
-				$('#offersField').prop('checked', false);
+				$('#offersField').prop('checked', false).checkboxradio('refresh');
 			}
 		}
 	    },
