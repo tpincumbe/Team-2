@@ -79,7 +79,7 @@ function register(){
 	            console.log(
 	                "The following error occured: "+
 	                textStatus, errorThrown
-	            );
+	            );				$('#offersField').prop('checked', false).checkboxradio('refresh');
 	        }
         });
     }else {
@@ -89,4 +89,10 @@ function register(){
     		alert("Passwords do not match");
     	}
     }
+}
+
+//Updates the checkbox and dropdown reset
+function checkboxDropdownReset() {
+	$('#offersField').prop('checked', false).checkboxradio('refresh');
+        $('#stateField').val('AL').selectmenu('refresh');
 }
